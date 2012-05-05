@@ -1,0 +1,4081 @@
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["TexAct", "Title",
+ FontColor->RGBColor[1, 0, 0]],
+
+Cell[TextData[{
+ "Tex code to format ",
+ StyleBox["xAct",
+  FontSlant->"Italic"],
+ " expressions"
+}], "Subtitle",
+ FontColor->RGBColor[0, 0, 1]],
+
+Cell[TextData[{
+ StyleBox["Thomas B\[ADoubleDot]ckdahl, Jos\[EAcute] M. Mart\[IAcute]n-Garc\
+\[IAcute]a and Barry Wardell\n",
+  FontSize->18],
+ "(c) 2008-2012, under GPL\n\nthomas.backdahl@aei.mpg.de, jose@xAct.es, ",
+ "barry.wardell@gmail.com",
+ "\nhttp://www.xAct.es/\nhttp://groups.google.com/group/xAct"
+}], "Subsubtitle"],
+
+Cell[TextData[{
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " has a function TeXForm but does not behave well with the indexed \
+expressions of ",
+ StyleBox["xAct",
+  FontSlant->"Italic"],
+ ". We construct our own Tex function, which starts from the internal form, \
+and not the box-form of the expression. The objective is building a ",
+ Cell[BoxData[
+  StyleBox[
+   RowBox[{"T", 
+    AdjustmentBox["E",
+     BoxBaselineShift->0.5,
+     BoxMargins->{{-0.075, -0.085}, {0, 0}}], "X"}]]]],
+ " string from our expression.\n\nJose: This package has been excised from ",
+ StyleBox["xTensor",
+  FontSlant->"Italic"],
+ " in April 2012, to make it easier to mantain, and to acknowledge the \
+essential contributions by Thomas and Barry."
+}], "Text"],
+
+Cell[CellGroupData[{
+
+Cell["1. Info and copyright", "Section",
+ FontColor->RGBColor[0, 0, 1]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"IntegerPart", "/@", 
+  RowBox[{"Date", "[", "]"}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"2012", ",", "5", ",", "4", ",", "10", ",", "59", ",", "1"}], 
+  "}"}]], "Output"]
+}, Open  ]],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"xAct`TexAct`$Version", "=", 
+   RowBox[{"{", 
+    RowBox[{"\"\<0.3.0\>\"", ",", 
+     RowBox[{"{", 
+      RowBox[{"2012", ",", "5", ",", "5"}], "}"}]}], "}"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"xAct`TexAct`$xTensorVersionExpected", "=", 
+   RowBox[{"{", 
+    RowBox[{"\"\<1.0.4\>\"", ",", 
+     RowBox[{"{", 
+      RowBox[{"2012", ",", "5", ",", "5"}], "}"}]}], "}"}]}], ";"}]}], "Input",
+ InitializationCell->True],
+
+Cell[CellGroupData[{
+
+Cell["1.0. TODO LIST", "Subsection"],
+
+Cell["Representation of SeriesData expressions.", "Text"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["1.1. GPL", "Subsection"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"TexAct", ",", " ", 
+    RowBox[{
+    "Tex", " ", "code", " ", "to", " ", "format", " ", "xAct", " ", 
+     "expressions"}]}], " ", "*)"}], "\[IndentingNewLine]", 
+  "\[IndentingNewLine]", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Copyright", " ", 
+      RowBox[{"(", "C", ")"}], " ", "2008"}], "-", 
+     RowBox[{"2012", " ", "Thomas", " ", "B\[ADoubleDot]ckdahl"}]}], ",", " ", 
+    RowBox[{
+     RowBox[{"Jose", " ", 
+      RowBox[{"M", ".", " ", "Martin"}]}], "-", 
+     RowBox[{"Garcia", " ", "and", " ", "Barry", " ", "Wardell"}]}]}], " ", 
+   "*)"}], "\[IndentingNewLine]", "\[IndentingNewLine]", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+    RowBox[{
+     RowBox[{
+     "This", " ", "program", " ", "is", " ", "free", " ", "software"}], ";", 
+     " ", 
+     RowBox[{"you", " ", "can", " ", "redistribute", " ", "it", " ", 
+      RowBox[{"and", "/", "or"}], " ", "modify", "\[IndentingNewLine]", " ", 
+      "it", " ", "under", " ", "the", " ", "terms", " ", "of", " ", "the", 
+      " ", "GNU", " ", "General", " ", "Public", " ", "License", " ", "as", 
+      " ", "published", "\[IndentingNewLine]", " ", "by", " ", "the", " ", 
+      "Free", " ", "Software", " ", "Foundation"}], ";", " ", 
+     RowBox[{
+     "either", " ", "version", " ", "2", " ", "of", " ", "the", " ", 
+      "License"}]}], ",", "\[IndentingNewLine]", "  ", 
+    RowBox[{"or", " ", 
+     RowBox[{"(", 
+      RowBox[{"at", " ", "your", " ", "option"}], ")"}], " ", "any", " ", 
+     "later", " ", 
+     RowBox[{
+     "version", ".", "\[IndentingNewLine]", "\[IndentingNewLine]", "This"}], 
+     " ", "program", " ", "is", " ", "distributed", " ", "in", " ", "the", 
+     " ", "hope", " ", "that", " ", "it", " ", "will", " ", "be", " ", 
+     "useful"}], ",", "\[IndentingNewLine]", "  ", 
+    RowBox[{
+     RowBox[{"but", " ", "WITHOUT", " ", "ANY", " ", "WARRANTY"}], ";", " ", 
+     RowBox[{
+     "without", " ", "even", " ", "the", " ", "implied", " ", "warranty", " ",
+       "of", "\[IndentingNewLine]", " ", "MERCHANTABILITY", " ", "or", " ", 
+      "FITNESS", " ", "FOR", " ", "A", " ", "PARTICULAR", " ", 
+      RowBox[{"PURPOSE", ".", " ", "See"}], " ", "the", " ", "GNU", 
+      "\[IndentingNewLine]", " ", "General", " ", "Public", " ", "License", 
+      " ", "for", " ", "more", " ", 
+      RowBox[{
+      "details", ".", "\[IndentingNewLine]", "\[IndentingNewLine]", "You"}], 
+      " ", "should", " ", "have", " ", "received", " ", "a", " ", "copy", " ",
+       "of", " ", "the", " ", "GNU", " ", "General", " ", "Public", " ", 
+      "License", "\[IndentingNewLine]", " ", "along", " ", "with", " ", 
+      "this", " ", "program"}], ";", " ", 
+     RowBox[{"if", " ", "not"}]}], ",", " ", 
+    RowBox[{
+    "write", " ", "to", " ", "the", " ", "Free", " ", "Software", 
+     "\[IndentingNewLine]", " ", "Foundation"}], ",", " ", 
+    RowBox[{"Inc", "."}], ",", " ", 
+    RowBox[{
+     RowBox[{"59", " ", "Temple", " ", "Place"}], "-", 
+     RowBox[{"Suite", " ", "330"}]}], ",", " ", "Boston", ",", " ", 
+    RowBox[{
+     RowBox[{"MA", " ", "02111"}], "-", "1307"}], ",", "\[IndentingNewLine]", 
+    "  ", 
+    RowBox[{"USA", "."}]}], " ", "\[IndentingNewLine]", "*)"}]}]], "Input",
+ InitializationCell->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["1.2. Info package", "Subsection"],
+
+Cell["\<\
+(* :Title: TexAct *)
+
+(* :Author: Thomas B\[ADoubleDot]ckdahl, Jose M. Martin-Garcia and Barry \
+Wardell *)
+
+(* :Summary: Tex code to formar xAct expressions *)
+
+(* :Brief Discussion:
+*)
+  
+(* :Context: xAct`Texsor` *)
+
+(* :Package Version: 0.3.0 *)
+
+(* :Copyright: Thomas B\[ADoubleDot]ckdahl, Jose M. Martin-Garcia and Barry \
+Wardell (2008-2012) *)
+
+(* :History: see TexAct.History file *)
+
+(* :Keywords: *)
+
+(* :Source: Texsor.nb *)
+
+(* :Warning: *)
+
+(* :Mathematica Version: 5.1 and later *)
+
+(* :Limitations: *)\
+\>", "Input",
+ PageWidth->PaperWidth,
+ CellMargins->{{60, -272}, {Inherited, Inherited}},
+ InitializationCell->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["1.3. BeginPackage", "Subsection"],
+
+Cell["Last package read in a session:", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"If", "[", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Unevaluated", "[", "xAct`xCore`Private`$LastPackage", "]"}], "===",
+      "xAct`xCore`Private`$LastPackage"}], ",", 
+    RowBox[{
+    "xAct`xCore`Private`$LastPackage", "=", "\"\<xAct`TexAct`\>\""}]}], "]"}],
+   ";"}]], "Input",
+ InitializationCell->True],
+
+Cell[CellGroupData[{
+
+Cell[BoxData["xAct`xCore`Private`$LastPackage"], "Input"],
+
+Cell[BoxData["\<\"xAct`TexAct`\"\>"], "Output"]
+}, Open  ]],
+
+Cell[TextData[{
+ "Explicit (not hidden) import of ",
+ StyleBox["xCore",
+  FontSlant->"Italic"],
+ ",  ",
+ StyleBox["xPerm",
+  FontSlant->"Italic"],
+ " and ",
+ StyleBox["ExpressionManipulation",
+  FontSlant->"Italic"],
+ " (the latter is not automatically read from version 0.6.2 of ",
+ StyleBox["xCore",
+  FontSlant->"Italic"],
+ "):"
+}], "Text"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"BeginPackage", "[", 
+  RowBox[{"\"\<xAct`TexAct`\>\"", ",", 
+   RowBox[{"{", 
+    RowBox[{
+    "\"\<xAct`xCore`\>\"", ",", "\"\<xAct`xPerm`\>\"", ",", 
+     "\"\<xAct`xTensor`\>\""}], "}"}]}], "]"}]], "Input",
+ InitializationCell->True],
+
+Cell[CellGroupData[{
+
+Cell[BoxData["\<\"------------------------------------------------------------\
+\"\>"], "Print"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"Package xAct`xPerm`  version \"\>", 
+   "\[InvisibleSpace]", "\<\"1.1.3\"\>", "\[InvisibleSpace]", "\<\", \"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{"2012", ",", "5", ",", "5"}], "}"}]}],
+  SequenceForm["Package xAct`xPerm`  version ", "1.1.3", ", ", {2012, 5, 5}],
+  Editable->False]], "Print"],
+
+Cell[BoxData["\<\"CopyRight (C) 2003-2011, Jose M. Martin-Garcia, under the \
+General Public License.\"\>"], "Print"],
+
+Cell[BoxData["\<\"Connecting to external cygwin executable...\"\>"], "Print"],
+
+Cell[BoxData["\<\"Connection established.\"\>"], "Print"],
+
+Cell[BoxData["\<\"------------------------------------------------------------\
+\"\>"], "Print"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"Package xAct`xTensor`  version \"\>", 
+   "\[InvisibleSpace]", "\<\"1.0.4\"\>", "\[InvisibleSpace]", "\<\", \"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{"2012", ",", "5", ",", "5"}], "}"}]}],
+  SequenceForm["Package xAct`xTensor`  version ", "1.0.4", ", ", {2012, 5, 5}],
+  Editable->False]], "Print"],
+
+Cell[BoxData["\<\"CopyRight (C) 2002-2011, Jose M. Martin-Garcia, under the \
+General Public License.\"\>"], "Print"]
+}, Open  ]],
+
+Cell[BoxData["\<\"xAct`TexAct`\"\>"], "Output"]
+}, Open  ]],
+
+Cell[TextData[{
+ "Check version of ",
+ StyleBox["xTensor",
+  FontSlant->"Italic"],
+ ". We simply compare dates:"
+}], "Text"],
+
+Cell[BoxData[
+ RowBox[{"If", "[", 
+  RowBox[{
+   RowBox[{"Not", "@", 
+    RowBox[{"OrderedQ", "@", 
+     RowBox[{"Map", "[", 
+      RowBox[{"Last", ",", 
+       RowBox[{"{", 
+        RowBox[{"$xTensorVersionExpected", ",", "xAct`xTensor`$Version"}], 
+        "}"}]}], "]"}]}]}], ",", 
+   RowBox[{"Throw", "@", 
+    RowBox[{"Message", "[", 
+     RowBox[{
+      RowBox[{"General", "::", "versions"}], ",", "\"\<xTensor\>\"", ",", 
+      "xAct`xTensor`$Version", ",", "$xTensorVersionExpected"}], "]"}]}]}], 
+  "]"}]], "Input",
+ InitializationCell->True],
+
+Cell["Message:", "Text"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"Print", "[", "xAct`xCore`Private`bars", "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Print", "[", 
+   RowBox[{"\"\<Package xAct`TexAct`  version \>\"", ",", 
+    RowBox[{"$Version", "[", 
+     RowBox[{"[", "1", "]"}], "]"}], ",", "\"\<, \>\"", ",", 
+    RowBox[{"$Version", "[", 
+     RowBox[{"[", "2", "]"}], "]"}]}], "]"}], ";"}], "\n", 
+ RowBox[{"Print", "[", 
+  "\"\<CopyRight (C) 2008-2012, Thomas B\[ADoubleDot]ckdahl, Jose M. \
+Martin-Garcia and Barry Wardell, under the General Public License.\>\"", 
+  "]"}]}], "Input",
+ InitializationCell->True],
+
+Cell[CellGroupData[{
+
+Cell[BoxData["\<\"------------------------------------------------------------\
+\"\>"], "Print"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"Package xAct`TexAct`  version \"\>", 
+   "\[InvisibleSpace]", "\<\"0.3.0\"\>", "\[InvisibleSpace]", "\<\", \"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{"2012", ",", "5", ",", "5"}], "}"}]}],
+  SequenceForm["Package xAct`TexAct`  version ", "0.3.0", ", ", {2012, 5, 5}],
+  
+  Editable->False]], "Print"],
+
+Cell[BoxData["\<\"CopyRight (C) 2008-2012, Thomas B\[ADoubleDot]ckdahl, Jose \
+M. Martin-Garcia and Barry Wardell, under the General Public License.\"\>"], \
+"Print"]
+}, Open  ]]
+}, Open  ]],
+
+Cell["\<\
+We specify the context xAct`TexAct` to avoid overriding the Disclaimer of \
+other packages. However we need to turn off the message General:shdw \
+temporarily:\
+\>", "Text"],
+
+Cell[BoxData[{
+ RowBox[{"Off", "[", 
+  RowBox[{"General", "::", "shdw"}], "]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"xAct`TexAct`Disclaimer", "[", "]"}], ":=", 
+  RowBox[{
+  "Print", "[", 
+   "\"\<These are points 11 and 12 of the General Public \
+License:\\n\\nBECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO \
+WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT \
+WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES \
+PROVIDE THE PROGRAM `AS IS\.b4 WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED \
+OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF \
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO \
+THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM \
+PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR \
+CORRECTION.\\n\\nIN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO \
+IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY \
+AND/OR REDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR \
+DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES \
+ARISING OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT \
+LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED \
+BY YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER \
+PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE \
+POSSIBILITY OF SUCH DAMAGES.\>\"", "]"}]}], "\[IndentingNewLine]", 
+ RowBox[{"On", "[", 
+  RowBox[{"General", "::", "shdw"}], "]"}]}], "Input",
+ InitializationCell->True],
+
+Cell["\<\
+If TexAct is the last package begin read, print the GPL message:\
+\>", "Text"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"If", "[", 
+  RowBox[{
+   RowBox[{"xAct`xCore`Private`$LastPackage", "===", "\"\<xAct`TexAct`\>\""}],
+    ",", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"Unset", "[", "xAct`xCore`Private`$LastPackage", "]"}], ";", 
+    "\[IndentingNewLine]", 
+    RowBox[{"Print", "[", "xAct`xCore`Private`bars", "]"}], ";", 
+    "\[IndentingNewLine]", 
+    RowBox[{
+    "Print", "[", 
+     "\"\<These packages come with ABSOLUTELY NO WARRANTY; for details type \
+Disclaimer[]. This is free software, and you are welcome to redistribute it \
+under certain conditions. See the General Public License for details.\>\"", 
+     "]"}], ";", "\[IndentingNewLine]", 
+    RowBox[{"Print", "[", "xAct`xCore`Private`bars", "]"}]}]}], 
+  "]"}]], "Input",
+ InitializationCell->True],
+
+Cell[CellGroupData[{
+
+Cell[BoxData["\<\"------------------------------------------------------------\
+\"\>"], "Print"],
+
+Cell[BoxData["\<\"These packages come with ABSOLUTELY NO WARRANTY; for \
+details type Disclaimer[]. This is free software, and you are welcome to \
+redistribute it under certain conditions. See the General Public License for \
+details.\"\>"], "Print"],
+
+Cell[BoxData["\<\"------------------------------------------------------------\
+\"\>"], "Print"]
+}, Open  ]]
+}, Open  ]]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["1.4. Usage messages", "Subsection"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"Tex", "::", "usage"}], "=", 
+   "\"\<Tex[expr] returns a string with the TeX formatting of the tensorial \
+expression expr.\>\""}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"TexPrint", "::", "usage"}], "=", 
+   "\"\<TexPrint[expr] returns a string for screen printing of the TeX \
+formatting of the tensorial expression expr. TexPrint[expr, n] starts using \
+parenthesization of level n, instead of the Automatic level.\>\""}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"TexBreak", "::", "usage"}], "=", 
+   "\"\<TexBreak[string] breaks the string (the output of TexPrint) into \
+different lines of TeX code, always before a sum, approximately every 200 \
+characters (or terms, using the option TexBreakBy) of the string. \
+TexBreak[string, n] allows specifying the frequency of characters or terms. \
+TexBreak[string, n, list] allows specifying different lengths for different \
+lines. Other relevant options are TexBreakAt and TexBreakString.\>\""}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"TexBreakBy", "::", "usage"}], "=", 
+   "\"\<TexBreakBy is an option for TexBreak specifying whether the string of \
+TeX code must be broken by counting characters (value \\\"Character\\\") or \
+by counting terms (value \\\"Term\\\").\>\""}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"TexBreakAt", "::", "usage"}], "=", 
+   "\"\<TexBreakAt is an option for TexBreak specifying where to break the \
+string of TeX code.\>\""}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"TexBreakString", "::", "usage"}], "=", 
+   "\"\<TexBreakString is an option for TexBreak specifying the string to be \
+introduced at the breaking points.\>\""}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"$TexPrintInitialBracesQ", "::", "usage"}], "=", 
+   "\"\<$TexPrintInitialBracesQ is a Boolean global variable, with default \
+False. If set to True a tensor is formatted as T{}^{ab}{}_{cd}. If set to \
+False the same tensor is formatted as T^{ab}{}_{cd}.\>\""}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"$TexScalarParentheses", "::", "usage"}], "=", 
+   "\"\<$TexScalarParentheses is a Boolean global variable, with default \
+True. If set to True the Scalar expressions are formatted with wrapping \
+parentheses.\>\""}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"$TexFraction", "::", "usage"}], "=", 
+   "\"\<$TexFraction is a global variable specifying the Tex command to be \
+used to format fractions, with default \\\"\\\\frac\\\".\>\""}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"$TexSmallFraction", "::", "usage"}], "=", 
+   "\"\<$TexSmallFraction is a global variable specifying the Tex command to \
+be use to format rational numbers, with default \\\"\\\\tfrac\\\".\>\""}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"$TexFractionAsFraction", "::", "usage"}], "=", 
+   "\"\<Option for TexPrint. If True, fractions are printed as fractions, \
+otherwize they are printed as a product with negative exponents.\>\""}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"$TexParenthesisInitLevel", "::", "usage"}], "=", "\"\<\>\""}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"$TexFixExtraRules", "::", "usage"}], "=", "\"\<\>\""}], 
+  ";"}]}], "Input",
+ InitializationCell->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["1.5. Begin private section", "Subsection"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Begin", "[", "\"\<`Private`\>\"", "]"}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData["\<\"xAct`TexAct`Private`\"\>"], "Output"]
+}, Open  ]]
+}, Closed]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["2. Parentheses", "Section",
+ FontColor->RGBColor[0, 0, 1]],
+
+Cell[CellGroupData[{
+
+Cell["2.1. Open and close parentheses", "Subsection"],
+
+Cell["We define a hierarchy of parenthesis.", "Text"],
+
+Cell[TextData[{
+ "There is a global variable ",
+ StyleBox["level", "Input"],
+ " that stores the parenthesization level at each particular time. There is \
+also the global variable ",
+ StyleBox["minlevel", "Input"],
+ ". The idea is that each call to TexMaximumLevel has a Block with these two \
+variables. This is not very elegant."
+}], "Text"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"TexOpen", "[", "string_String", "]"}], ":=", 
+   RowBox[{
+    RowBox[{"OpenParenthesis", "[", 
+     RowBox[{"Decrement", "[", "level", "]"}], "]"}], "<>", "string"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"TexClose", "[", "string_String", "]"}], ":=", 
+   RowBox[{
+    RowBox[{"CloseParenthesis", "[", 
+     RowBox[{"PreIncrement", "[", "level", "]"}], "]"}], "<>", "string"}]}], 
+  ";"}]}], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"Trick", " ", "to", " ", "count", " ", "maximum", " ", "depth"}], 
+   " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"OpenParenthesis", "[", 
+      RowBox[{"level_Integer", "?", "Negative"}], "]"}], ":=", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"minlevel", "=", 
+        RowBox[{"Min", "[", 
+         RowBox[{"minlevel", ",", "level"}], "]"}]}], ";", "\"\<\>\""}], 
+      ")"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"CloseParenthesis", "[", 
+      RowBox[{"level_Integer", "?", "Negative"}], "]"}], ":=", "\"\<\>\""}], 
+    ";"}], "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"OpenParenthesis", "[", "0", "]"}], ":=", "\"\<\>\""}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"CloseParenthesis", "[", "0", "]"}], ":=", "\"\<\>\""}], ";"}], 
+   "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"OpenParenthesis", "[", "1", "]"}], ":=", "\"\<\\\\bigl\>\""}], 
+    ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"CloseParenthesis", "[", "1", "]"}], ":=", "\"\<\\\\bigr\>\""}], 
+    ";"}], "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"OpenParenthesis", "[", "2", "]"}], ":=", "\"\<\\\\Bigl\>\""}], 
+    ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"CloseParenthesis", "[", "2", "]"}], ":=", "\"\<\\\\Bigr\>\""}], 
+    ";"}], "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"OpenParenthesis", "[", "3", "]"}], ":=", "\"\<\\\\biggl\>\""}], 
+    ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"CloseParenthesis", "[", "3", "]"}], ":=", "\"\<\\\\biggr\>\""}],
+     ";"}], "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"OpenParenthesis", "[", "4", "]"}], ":=", "\"\<\\\\Biggl\>\""}], 
+    ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"CloseParenthesis", "[", "4", "]"}], ":=", "\"\<\\\\Biggr\>\""}],
+     ";"}], "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"OpenParenthesis", "[", 
+      RowBox[{"level_Integer", "?", "Positive"}], "]"}], ":=", 
+     "\"\<\\\\left\>\""}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"CloseParenthesis", "[", 
+      RowBox[{"level_Integer", "?", "Positive"}], "]"}], ":=", 
+     "\"\<\\\\right\>\""}], ";"}]}]}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"Main", ".", " ", "Private"}], " ", "*)"}], "\[IndentingNewLine]", 
+  
+  RowBox[{
+   RowBox[{
+    RowBox[{"TexMaximumLevel", "[", "expr_", "]"}], ":=", 
+    RowBox[{"Block", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"level", "=", "0"}], ",", 
+        RowBox[{"minlevel", "=", "0"}]}], "}"}], ",", 
+      RowBox[{
+       RowBox[{"Tex", "[", "expr", "]"}], ";", 
+       RowBox[{"-", "minlevel"}]}]}], "]"}]}], ";"}]}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Safety", " ", "definitions", " ", "for", " ", "direct", " ", "examples", 
+    " ", "with", " ", "Tex"}], " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"level", "=", "0"}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"minlevel", "=", "0"}], ";"}]}]}]], "Input",
+ InitializationCell->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["2.2. Main function", "Subsection"],
+
+Cell["\<\
+The key idea here is that there are two calls to the function Tex. We first \
+run through the whole expression with TexMaximumLevel, which uses Tex, to \
+discover the number of parentheses needed. In this first run the resulting \
+expression string  has wrong parentheses (actually no parentheses). Then we \
+call Tex again, this time producing the correct parentheses. If we provide \
+the second argument of TexParenthesis then we avoid the first run.\
+\>", "Text"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"$VerboseParenthesizationLevel", "=", "False"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"TexParenthesis", "[", 
+    RowBox[{"expr_", ",", 
+     RowBox[{"initlevel_:", "Automatic"}]}], "]"}], ":=", 
+   RowBox[{"Block", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"level", "=", 
+       RowBox[{"If", "[", 
+        RowBox[{
+         RowBox[{"initlevel", "===", "Automatic"}], ",", 
+         RowBox[{"TexMaximumLevel", "[", "expr", "]"}], ",", "initlevel"}], 
+        "]"}]}], "}"}], ",", 
+     RowBox[{
+      RowBox[{"If", "[", 
+       RowBox[{"$VerboseParenthesationLevel", ",", 
+        RowBox[{"Print", "[", 
+         RowBox[{"\"\<Maximum parenthesization level: \>\"", ",", "level"}], 
+         "]"}]}], "]"}], ";", "\[IndentingNewLine]", 
+      RowBox[{"Tex", "[", "expr", "]"}]}]}], "\[IndentingNewLine]", "]"}]}], 
+  ";"}]}], "Input",
+ InitializationCell->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["2.3. Alternative code. Not used", "Subsection"],
+
+Cell["\<\
+This is some alternative code whose origin or purpose has been forgotten... \
+It is not included in the package.\
+\>", "Text"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"ZParenth", "[", 
+     RowBox[{"ZParenth", "[", "expr_", "]"}], "]"}], ":=", 
+    RowBox[{"ZParenth", "[", "expr", "]"}]}], ";"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", " ", "Atoms", " ", "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"AddParenth", "[", 
+    RowBox[{"x", ":", 
+     RowBox[{"(", 
+      RowBox[{
+      "_Symbol", "|", "_String", "|", "_Integer", "|", "_Rational", "|", 
+       "_Real"}], ")"}]}], "]"}], ":=", "x"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"AddParenth", "[", "x_Complex", "]"}], ":=", 
+    RowBox[{"ZParenth", "[", "x", "]"}]}], ";"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", " ", 
+   RowBox[{"Products", " ", "and", " ", "sums"}], " ", 
+   "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"AddParenth", "[", 
+    RowBox[{"Times", "[", 
+     RowBox[{"x_", ",", "y_Plus"}], "]"}], "]"}], ":=", 
+   RowBox[{
+    RowBox[{"AddParenth", "[", "x", "]"}], 
+    RowBox[{"ZParenth", "[", 
+     RowBox[{"AddParenth", "[", "y", "]"}], "]"}]}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"AddParenth", "[", "expr_Times", "]"}], ":=", 
+   RowBox[{"AddParenth", "/@", "expr"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"AddParenth", "[", "expr_Plus", "]"}], ":=", 
+    RowBox[{"AddParenth", "/@", "expr"}]}], ";"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", " ", "Powers", " ", "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"AddParenth", "[", 
+    RowBox[{"Power", "[", 
+     RowBox[{
+      RowBox[{"x", ":", 
+       RowBox[{"(", 
+        RowBox[{"_Symbol", "|", 
+         RowBox[{
+          RowBox[{"_", "?", "xTensorQ"}], "[", "___", "]"}]}], ")"}]}], ",", 
+      "n_"}], "]"}], "]"}], ":=", 
+   RowBox[{"Power", "[", 
+    RowBox[{
+     RowBox[{"AddParenth", "[", "x", "]"}], ",", 
+     RowBox[{"AddParenth", "[", "n", "]"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"AddParenth", "[", 
+     RowBox[{"Power", "[", 
+      RowBox[{"x_", ",", "n_"}], "]"}], "]"}], ":=", 
+    RowBox[{"Power", "[", 
+     RowBox[{
+      RowBox[{"ZParenth", "[", 
+       RowBox[{"AddParenth", "[", "x", "]"}], "]"}], ",", 
+      RowBox[{"AddParenth", "[", "n", "]"}]}], "]"}]}], ";"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"(*", " ", "Objects", " ", "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"AddParenth", "[", 
+    RowBox[{"t", ":", 
+     RowBox[{
+      RowBox[{"_", "?", "xTensorQ"}], "[", "___", "]"}]}], "]"}], ":=", "t"}],
+   ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"AddParenth", "[", 
+    RowBox[{"c", ":", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"_Symbol", "?", "CovDQ"}], "[", "__", "]"}], "[", "_", "]"}]}],
+     "]"}], ":=", "c"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"AddParenth", "[", "c_CovD", "]"}], ":=", "c"}], ";"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Scalar", " ", "functions", " ", "and", " ", "inert", " ", "heads"}], " ", 
+   "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"AddParenth", "[", 
+    RowBox[{
+     RowBox[{"f_", "?", "ScalarFunctionQ"}], "[", "exprs__", "]"}], "]"}], ":=", 
+   RowBox[{
+    RowBox[{"AddParenth", "[", "f", "]"}], "[", 
+    RowBox[{"AddParenth", "/@", 
+     RowBox[{"OParenth", "[", "exprs", "]"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"AddParenth", "[", 
+     RowBox[{
+      RowBox[{"ih_Symbol", "?", "InertHeadQ"}], "[", 
+      RowBox[{"expr_", ",", "z___"}], "]"}], "]"}], ":=", 
+    RowBox[{"ih", "[", 
+     RowBox[{
+      RowBox[{"OParenth", "[", 
+       RowBox[{"AddParenth", "[", "expr", "]"}], "]"}], ",", "z"}], "]"}]}], 
+   ";"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", " ", 
+   RowBox[{"Parametric", " ", "derivatives"}], " ", 
+   "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"AddParenth", "[", 
+    RowBox[{
+     RowBox[{"ParamD", "[", "ps__", "]"}], "[", "expr_", "]"}], "]"}], ":=", 
+   RowBox[{
+    RowBox[{"ParamD", "[", "ps", "]"}], "[", 
+    RowBox[{"OParenth", "[", 
+     RowBox[{"AddParenth", "[", "expr", "]"}], "]"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"AddParentheses", "[", "expr_", "]"}], ":=", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"Pexpr", "=", 
+       RowBox[{"AddParenth", "[", "expr", "]"}]}], ",", "pos"}], "}"}], ",", 
+    "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"pos", "=", 
+      RowBox[{"Most", "/@", 
+       RowBox[{"Position", "[", 
+        RowBox[{"Pexpr", ",", "ZParenth", ",", 
+         RowBox[{"Heads", "\[Rule]", "True"}]}], "]"}]}]}], ";"}]}], 
+   "\[IndentingNewLine]", "]"}]}]}], "Input"]
+}, Closed]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["3. Type formatting", "Section",
+ FontColor->RGBColor[0, 0, 1]],
+
+Cell[CellGroupData[{
+
+Cell["3.0. The Tex function", "Subsection"],
+
+Cell[TextData[{
+ "The function Tex does most of the actual construction of the final string. \
+It gets directly the ",
+ StyleBox["xAct",
+  FontSlant->"Italic"],
+ " expressions and returns a string. The final result will be simply a \
+concatenation of the individual strings, except for the parenthesization \
+issues."
+}], "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"Just", " ", "in", " ", "case"}], " ", "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"Tex", "[", "]"}], ":=", "\"\<\>\""}], ";"}]}]], "Input",
+ InitializationCell->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["3.1. Fractions", "Subsection"],
+
+Cell["\<\
+Because some people might want to use the \"\\\\tfrac\" or \"\\\\dfrac\" \
+commands of amsmath, we introduce these two variables:\
+\>", "Text"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"?", "$TexFraction"}]], "Input"],
+
+Cell[BoxData[
+ StyleBox["\<\"$TexFraction is a global variable specifying the Tex command \
+to be used to format fractions, with default \\\"\\\\frac\\\".\"\>", 
+  "MSG"]], "Print", "PrintUsage"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"?", "$TexSmallFraction"}]], "Input"],
+
+Cell[BoxData[
+ StyleBox["\<\"$TexSmallFraction is a global variable specifying the Tex \
+command to be use to format rational numbers, with default \\\"\\\\tfrac\\\".\
+\"\>", "MSG"]], "Print", "PrintUsage"]
+}, Open  ]],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"$TexFraction", "=", "\"\<\\\\frac\>\""}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"$TexSmallFraction", "=", "\"\<\\\\tfrac\>\""}], ";"}]}], "Input",
+ InitializationCell->True],
+
+Cell["\<\
+Code to avoid printing fractions as products. One can avoid all fractions \
+except rationals and square roots by setting TexFractionAsFraction->False.\
+\>", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"TexFrac1", "[", 
+    RowBox[{"numer_", ",", " ", "denom_", ",", "fracsymbol_"}], "]"}], ":=", 
+   RowBox[{"StringJoin", "[", 
+    RowBox[{"fracsymbol", ",", "\"\<{\>\"", ",", 
+     RowBox[{"Tex", "[", "numer", "]"}], ",", "\"\<}{\>\"", ",", 
+     RowBox[{"Tex", "[", "denom", "]"}], ",", "\"\<}\>\""}], "]"}]}], 
+  ";"}]], "Input",
+ InitializationCell->True],
+
+Cell["If the numerator begins with a minus, we move the sign out. ", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"TexFracExpression", "[", 
+    RowBox[{"numer_", ",", " ", "denom_", ",", "fracsymbol_"}], "]"}], ":=", 
+   RowBox[{"If", "[", 
+    RowBox[{
+     RowBox[{"WithMinusQ", "[", "numer", "]"}], ",", "\[IndentingNewLine]", 
+     RowBox[{"StringJoin", "[", 
+      RowBox[{
+       RowBox[{"TexOperator", "[", "Minus", "]"}], ",", 
+       RowBox[{"TexFrac1", "[", 
+        RowBox[{
+         RowBox[{"-", 
+          RowBox[{"(", "numer", ")"}]}], ",", "denom", ",", "fracsymbol"}], 
+        "]"}]}], "]"}], ",", "\[IndentingNewLine]", 
+     RowBox[{"TexFrac1", "[", 
+      RowBox[{"numer", ",", "denom", ",", "fracsymbol"}], "]"}]}], 
+    "\[IndentingNewLine]", "]"}]}], ";"}]], "Input",
+ InitializationCell->True],
+
+Cell["Detect the presence of a negative sign:", "Text"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"WithMinusQ", "[", "expr_String", "]"}], ":=", 
+   RowBox[{"SameQ", "[", 
+    RowBox[{
+     RowBox[{"StringTake", "[", 
+      RowBox[{"expr", ",", "1"}], "]"}], ",", "\"\<-\>\""}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"WithMinusQ", "[", "expr_", "]"}], ":=", 
+   RowBox[{"WithMinusQ", "[", 
+    RowBox[{"Tex", "[", "expr", "]"}], "]"}]}], ";"}]}], "Input",
+ InitializationCell->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["3.2. Numbers", "Subsection"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", "Numbers", " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", "x_Integer", "]"}], ":=", 
+     RowBox[{"ToString", "[", "x", "]"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", "x_Real", "]"}], ":=", 
+     RowBox[{"ToString", "[", "x", "]"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", "x_Rational", "]"}], ":=", 
+     RowBox[{"TexFracExpression", "[", 
+      RowBox[{
+       RowBox[{"Numerator", "[", "x", "]"}], ",", 
+       RowBox[{"Denominator", "[", "x", "]"}], ",", "$TexSmallFraction"}], 
+      "]"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", 
+      RowBox[{"Complex", "[", 
+       RowBox[{"0", ",", "1"}], "]"}], "]"}], "=", "\"\<i\>\""}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", 
+      RowBox[{"Complex", "[", 
+       RowBox[{"0", ",", 
+        RowBox[{"-", "1"}]}], "]"}], "]"}], "=", "\"\<-i\>\""}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", 
+      RowBox[{"Complex", "[", 
+       RowBox[{"0", ",", "im_"}], "]"}], "]"}], ":=", 
+     RowBox[{"StringJoin", "[", 
+      RowBox[{
+       RowBox[{"Tex", "[", "im", "]"}], ",", 
+       RowBox[{"Tex", "[", "I", "]"}]}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", 
+      RowBox[{"Complex", "[", 
+       RowBox[{"re_", ",", "im_"}], "]"}], "]"}], ":=", 
+     RowBox[{"StringJoin", "[", 
+      RowBox[{
+       RowBox[{"TexOpen", "[", "\"\<(\>\"", "]"}], ",", 
+       RowBox[{"Tex", "[", "re", "]"}], ",", "\"\<+\>\"", ",", 
+       RowBox[{"Tex", "[", 
+        RowBox[{"im", " ", "I"}], "]"}], ",", 
+       RowBox[{"TexClose", "[", "\"\<)\>\"", "]"}]}], "]"}]}], 
+    ";"}]}]}]], "Input",
+ InitializationCell->True],
+
+Cell["Should we give definitions for other numeric objects here?", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"Numeric", " ", "expressions"}], " ", "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", "E", "]"}], "=", "\"\<e\>\""}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", "Pi", "]"}], "=", "\"\<\\\\pi\>\""}], 
+    ";"}]}]}]], "Input",
+ InitializationCell->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["3.3. Strings", "Subsection"],
+
+Cell[TextData[{
+ "With strings we call ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ "'s TeXForm, removing the frequent and annoying \\text{*} :"
+}], "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", "Strings", " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"Removetext", "[", "string_String", "]"}], ":=", 
+     RowBox[{
+      RowBox[{"StringDrop", "[", 
+       RowBox[{
+        RowBox[{"StringDrop", "[", 
+         RowBox[{"string", ",", "6"}], "]"}], ",", 
+        RowBox[{"-", "1"}]}], "]"}], "/;", 
+      RowBox[{"StringMatchQ", "[", 
+       RowBox[{"string", ",", "\"\<\\\\text{*}\>\""}], "]"}]}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Removetext", "[", "string_String", "]"}], ":=", "string"}], 
+    ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", "string_String", "]"}], ":=", 
+     RowBox[{"Removetext", "@", 
+      RowBox[{"ToString", "@", 
+       RowBox[{"TeXForm", "@", "string"}]}]}]}], ";"}]}]}]], "Input",
+ InitializationCell->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["3.4. Functions", "Subsection"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", "Functions", " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", "Sin", "]"}], ":=", "\"\<\\\\sin\>\""}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", "Cos", "]"}], ":=", "\"\<\\\\cos\>\""}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", "Sec", "]"}], ":=", "\"\<\\\\sec\>\""}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", "Csc", "]"}], ":=", "\"\<\\\\csc\>\""}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", "Cot", "]"}], ":=", "\"\<\\\\cot\>\""}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", "Tan", "]"}], ":=", "\"\<\\\\tan\>\""}], 
+    ";"}]}]}]], "Input",
+ InitializationCell->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["3.5. Symbols", "Subsection"],
+
+Cell["Symbol formatting on the result of PrintAs:", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"Symbols", " ", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{"including", " ", "constant"}], "-", 
+      RowBox[{"symbols", " ", "and", " ", "parameters"}]}], ")"}]}], " ", 
+   "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"Tex", "[", "symbol_Symbol", "]"}], ":=", 
+    RowBox[{"Tex", "@", 
+     RowBox[{"PrintAs", "[", "symbol", "]"}]}]}], ";"}]}]], "Input",
+ InitializationCell->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["3.6. Indices", "Subsection"],
+
+Cell["\<\
+Those indices which are not recognized by neither UpIndexQ or DownIndexQ (for \
+example patterns) are passed to ToString:\
+\>", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"One", " ", "index"}], " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"TexUpIndex", "[", "index_", "]"}], ":=", 
+    RowBox[{"Tex", "[", 
+     RowBox[{"IndexForm", "[", "index", "]"}], "]"}]}], ";"}]}]], "Input",
+ InitializationCell->True],
+
+Cell["\<\
+Jose\[CloseCurlyQuote]s old code. Now deactivated.\
+\>", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"Lists", " ", "of", " ", "indices"}], " ", "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"TexIndex", "[", "list_IndexList", "]"}], ":=", 
+     RowBox[{"Apply", "[", 
+      RowBox[{"StringJoin", ",", 
+       RowBox[{"TexIndex", "/@", "list"}]}], "]"}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"TexIndex", "[", 
+      RowBox[{"list_IndexList", ",", "der_String"}], "]"}], ":=", 
+     "\"\<TODO\>\""}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"TexIndex", "[", 
+      RowBox[{"IndexList", "[", "]"}], "]"}], ":=", 
+     RowBox[{"Sequence", "[", "]"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{"(*", " ", 
+    RowBox[{
+     RowBox[{"Individual", " ", "index"}], ",", " ", 
+     RowBox[{
+     "with", " ", "or", " ", "without", " ", "a", " ", "derivative"}]}], " ", 
+    "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"TexIndex", "[", 
+      RowBox[{"index_", "?", "UpIndexQ"}], "]"}], ":=", 
+     RowBox[{"StringJoin", "[", 
+      RowBox[{"\"\<{}^{\>\"", ",", 
+       RowBox[{"TexUpIndex", "[", "index", "]"}], ",", "\"\<}\>\""}], "]"}]}],
+     ";"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"TexIndex", "[", 
+      RowBox[{"index_", "?", "DownIndexQ"}], "]"}], ":=", 
+     RowBox[{"StringJoin", "[", 
+      RowBox[{"\"\<{}_{\>\"", ",", 
+       RowBox[{"TexUpIndex", "[", 
+        RowBox[{"ChangeIndex", "[", "index", "]"}], "]"}], ",", "\"\<}\>\""}],
+       "]"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"TexIndex", "[", 
+      RowBox[{
+       RowBox[{"index_", "?", "UpIndexQ"}], ",", "der_String"}], "]"}], ":=", 
+     
+     RowBox[{"StringJoin", "[", 
+      RowBox[{"\"\<{}^{\>\"", ",", 
+       RowBox[{"Tex", "@", "der"}], ",", 
+       RowBox[{"TexUpIndex", "[", "index", "]"}], ",", "\"\<}\>\""}], "]"}]}],
+     ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"TexIndex", "[", 
+      RowBox[{
+       RowBox[{"index_", "?", "DownIndexQ"}], ",", "der_String"}], "]"}], ":=", 
+     RowBox[{"StringJoin", "[", 
+      RowBox[{"\"\<{}_{\>\"", ",", 
+       RowBox[{"Tex", "@", "der"}], ",", 
+       RowBox[{"TexUpIndex", "[", 
+        RowBox[{"ChangeIndex", "[", "index", "]"}], "]"}], ",", "\"\<}\>\""}],
+       "]"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"TexIndex", "[", "index_", "]"}], ":=", 
+     RowBox[{"ToString", "[", "index", "]"}]}], ";"}]}]}]], "Input",
+ Evaluatable->False],
+
+Cell["\<\
+Thomas\[CloseCurlyQuote] newer code. Highly recursive:\
+\>", "Text"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"$TexPrintInitialBracesQ", "=", "False"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"initbraces", "[", "]"}], ":=", 
+    RowBox[{"If", "[", 
+     RowBox[{"$TexPrintInitialBracesQ", ",", "\"\<{}\>\"", ",", "\"\<\>\""}], 
+     "]"}]}], ";"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", " ", "Main", " ", "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"TexIndices", "[", "]"}], ":=", 
+   RowBox[{"Sequence", "[", "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"TexIndices", "[", 
+    RowBox[{
+     RowBox[{"first_", "?", "UpIndexQ"}], ",", "more___"}], "]"}], ":=", 
+   RowBox[{"StringJoin", "[", 
+    RowBox[{
+     RowBox[{"initbraces", "[", "]"}], ",", "\"\<^{\>\"", ",", 
+     RowBox[{"TexUpIndex", "[", "first", "]"}], ",", 
+     RowBox[{"TexIndicesFromUp", "[", "more", "]"}], ",", "\"\<}\>\""}], 
+    "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"TexIndices", "[", 
+     RowBox[{
+      RowBox[{"first_", "?", "DownIndexQ"}], ",", "more___"}], "]"}], ":=", 
+    RowBox[{"StringJoin", "[", 
+     RowBox[{
+      RowBox[{"initbraces", "[", "]"}], ",", "\"\<_{\>\"", ",", 
+      RowBox[{"TexUpIndex", "[", 
+       RowBox[{"ChangeIndex", "@", "first"}], "]"}], ",", 
+      RowBox[{"TexIndicesFromDown", "[", "more", "]"}], ",", "\"\<}\>\""}], 
+     "]"}]}], ";"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", " ", 
+   RowBox[{"Previous", " ", "index", " ", "was", " ", "up"}], " ", 
+   "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"TexIndicesFromUp", "[", "]"}], ":=", 
+   RowBox[{"Sequence", "[", "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"TexIndicesFromUp", "[", 
+    RowBox[{
+     RowBox[{"first_", "?", "UpIndexQ"}], ",", "more___"}], "]"}], ":=", 
+   RowBox[{"StringJoin", "[", 
+    RowBox[{
+     RowBox[{"TexUpIndex", "[", "first", "]"}], ",", 
+     RowBox[{"TexIndicesFromUp", "[", "more", "]"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"TexIndicesFromUp", "[", 
+     RowBox[{
+      RowBox[{"first_", "?", "DownIndexQ"}], ",", "more___"}], "]"}], ":=", 
+    RowBox[{"StringJoin", "[", 
+     RowBox[{"\"\<}{}_{\>\"", ",", 
+      RowBox[{"TexUpIndex", "[", 
+       RowBox[{"ChangeIndex", "@", "first"}], "]"}], ",", 
+      RowBox[{"TexIndicesFromDown", "[", "more", "]"}]}], "]"}]}], ";"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"(*", " ", 
+   RowBox[{"Previous", " ", "index", " ", "was", " ", "down"}], " ", 
+   "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"TexIndicesFromDown", "[", "]"}], ":=", 
+   RowBox[{"Sequence", "[", "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"TexIndicesFromDown", "[", 
+    RowBox[{
+     RowBox[{"first_", "?", "DownIndexQ"}], ",", "more___"}], "]"}], ":=", 
+   RowBox[{"StringJoin", "[", 
+    RowBox[{
+     RowBox[{"TexUpIndex", "[", 
+      RowBox[{"ChangeIndex", "@", "first"}], "]"}], ",", 
+     RowBox[{"TexIndicesFromDown", "[", "more", "]"}]}], "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"TexIndicesFromDown", "[", 
+     RowBox[{
+      RowBox[{"first_", "?", "UpIndexQ"}], ",", "more___"}], "]"}], ":=", 
+    RowBox[{"StringJoin", "[", 
+     RowBox[{"\"\<}{}^{\>\"", ",", 
+      RowBox[{"TexUpIndex", "[", "first", "]"}], ",", 
+      RowBox[{"TexIndicesFromUp", "[", "more", "]"}]}], "]"}]}], ";"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "With", " ", "derivative", " ", "indices", " ", "in", " ", "postfix", " ", 
+    "notation"}], " ", "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"TexCovDIndices", "[", "post_", "]"}], "[", 
+    RowBox[{
+     RowBox[{"first_", "?", "UpIndexQ"}], ",", "more___"}], "]"}], ":=", 
+   RowBox[{"StringJoin", "[", 
+    RowBox[{"\"\<{}^{\>\"", ",", "post", ",", 
+     RowBox[{"TexUpIndex", "[", "first", "]"}], ",", 
+     RowBox[{"TexIndicesFromUp", "[", "more", "]"}], ",", "\"\<}\>\""}], 
+    "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"TexCovDIndices", "[", "post_", "]"}], "[", 
+    RowBox[{
+     RowBox[{"first_", "?", "DownIndexQ"}], ",", "more___"}], "]"}], ":=", 
+   RowBox[{"StringJoin", "[", 
+    RowBox[{"\"\<{}_{\>\"", ",", "post", ",", 
+     RowBox[{"TexUpIndex", "[", 
+      RowBox[{"ChangeIndex", "@", "first"}], "]"}], ",", 
+     RowBox[{"TexIndicesFromDown", "[", "more", "]"}], ",", "\"\<}\>\""}], 
+    "]"}]}], ";"}]}], "Input",
+ InitializationCell->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["3.7. Operators", "Subsection"],
+
+Cell[TextData[{
+ "Note that ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " expands -(a+b) into -a-b, but not -2(a+b). We also include the former \
+case, because we could be formatting a held expression, for instance."
+}], "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"Unary", " ", "minus"}], " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"TexOperator", "[", "Minus", "]"}], "=", "\"\<- \>\""}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", 
+      RowBox[{"-", "expr_Plus"}], "]"}], ":=", 
+     RowBox[{"StringJoin", "[", 
+      RowBox[{
+       RowBox[{"TexOperator", "[", "Minus", "]"}], ",", 
+       RowBox[{"TexOpen", "[", "\"\<(\>\"", "]"}], ",", 
+       RowBox[{"Tex", "[", "expr", "]"}], ",", 
+       RowBox[{"TexClose", "[", "\"\<)\>\"", "]"}]}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", 
+      RowBox[{"-", "expr_"}], "]"}], ":=", 
+     RowBox[{
+      RowBox[{"TexOperator", "[", "Minus", "]"}], "<>", 
+      RowBox[{"Tex", "[", "expr", "]"}]}]}], ";"}]}]}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", "Product", " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"TexOperator", "[", "Times", "]"}], ":=", "\"\< \>\""}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"TexFactor", "[", "1", "]"}], ":=", "\"\<\>\""}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"TexFactor", "[", "expr_Plus", "]"}], ":=", 
+     RowBox[{"StringJoin", "[", 
+      RowBox[{
+       RowBox[{"TexOpen", "[", "\"\<(\>\"", "]"}], ",", 
+       RowBox[{"Tex", "[", "expr", "]"}], ",", 
+       RowBox[{"TexClose", "[", "\"\<)\>\"", "]"}]}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"TexFactor", "[", "expr_", "]"}], ":=", 
+     RowBox[{"Tex", "[", "expr", "]"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"TexOrdinaryTimes", "[", "expr_Times", "]"}], ":=", 
+     RowBox[{"StringJoin", "@@", 
+      RowBox[{"Riffle", "[", 
+       RowBox[{
+        RowBox[{"TexFactor", "/@", 
+         RowBox[{"List", "@@", "expr"}]}], ",", 
+        RowBox[{"TexOperator", "[", "Times", "]"}]}], "]"}]}]}], ";"}], "\n", 
+   
+   RowBox[{
+    RowBox[{
+     RowBox[{"TexOrdinaryTimes", "[", "expr_", "]"}], ":=", 
+     RowBox[{"Tex", "@", "expr"}]}], ";"}]}]}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"$TexFractionAsFraction", "=", "True"}], ";"}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"Tex", "[", "expr_Times", "]"}], ":=", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"numer", "=", 
+        RowBox[{"Numerator", "[", "expr", "]"}]}], ",", 
+       RowBox[{"denom", "=", 
+        RowBox[{"Denominator", "[", "expr", "]"}]}]}], "}"}], ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{"And", "[", 
+        RowBox[{
+         RowBox[{"!", 
+          RowBox[{"NumberQ", "[", "denom", "]"}]}], ",", 
+         "$TexFractionAsFraction"}], "]"}], ",", "\[IndentingNewLine]", 
+       RowBox[{"TexFracExpression", "[", 
+        RowBox[{"numer", ",", "denom", ",", "$TexFraction"}], "]"}], ",", 
+       "\[IndentingNewLine]", 
+       RowBox[{"TexOrdinaryTimes", "[", "expr", "]"}]}], 
+      "\[IndentingNewLine]", "]"}]}], "\[IndentingNewLine]", "]"}]}], 
+  ";"}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", "Sum", " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"TexOperator", "[", "Plus", "]"}], ":=", "\"\< + \>\""}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", "expr_Plus", "]"}], ":=", 
+     RowBox[{"StringJoin", "@@", 
+      RowBox[{"Riffle", "[", 
+       RowBox[{
+        RowBox[{"Tex", "/@", 
+         RowBox[{"List", "@@", "expr"}]}], ",", 
+        RowBox[{"TexOperator", "[", "Plus", "]"}]}], "]"}]}]}], 
+    ";"}]}]}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"Square", " ", "root", " ", "of", " ", "a", " ", "number"}], " ", 
+   "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", 
+      RowBox[{"Sqrt", "[", 
+       RowBox[{"num_", "?", "NumberQ"}], "]"}], "]"}], ":=", 
+     RowBox[{"StringJoin", "[", 
+      RowBox[{"\"\<\\\\sqrt{\>\"", ",", 
+       RowBox[{"Tex", "[", "num", "]"}], ",", "\"\<}\>\""}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", 
+      RowBox[{"Power", "[", 
+       RowBox[{
+        RowBox[{"num_", "?", "NumberQ"}], ",", 
+        RowBox[{
+         RowBox[{"-", "1"}], "/", "2"}]}], "]"}], "]"}], ":=", 
+     RowBox[{"StringJoin", "[", 
+      RowBox[{"$TexSmallFraction", ",", "\"\<{1}{\\\\sqrt{\>\"", ",", 
+       RowBox[{"Tex", "[", "num", "]"}], ",", "\"\<}}\>\""}], "]"}]}], 
+    ";"}]}]}]], "Input",
+ InitializationCell->True],
+
+Cell["\<\
+Special code to include square roots of numbers in the fractions.\
+\>", "Text"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"ExtractNumericalFactor", "[", "expr_Times", "]"}], ":=", 
+   RowBox[{"Times", "@@", 
+    RowBox[{"(", 
+     RowBox[{"Select", "[", 
+      RowBox[{
+       RowBox[{"List", "@@", "expr"}], ",", "NumberQ"}], "]"}], ")"}]}]}], 
+  ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"ExtractNumericalFactor", "[", 
+    RowBox[{"num_", "?", "NumberQ"}], "]"}], ":=", "num"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"ExtractNumericalFactor", "[", "___", "]"}], ":=", "1"}], 
+  ";"}]}], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"Other", " ", "square", " ", "roots"}], " ", "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"Tex", "[", 
+     RowBox[{"expr", ":", 
+      RowBox[{"Times", "[", 
+       RowBox[{
+        RowBox[{"Power", "[", 
+         RowBox[{
+          RowBox[{"num_", "?", "NumberQ"}], ",", 
+          RowBox[{
+           RowBox[{"-", "1"}], "/", "2"}]}], "]"}], ",", "___"}], "]"}]}], 
+     "]"}], ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"numfactor", "=", 
+         RowBox[{"ExtractNumericalFactor", "[", 
+          RowBox[{"expr", " ", 
+           RowBox[{"Sqrt", "[", "num", "]"}]}], "]"}]}], ",", 
+        "\[IndentingNewLine]", 
+        RowBox[{"numer", "=", 
+         RowBox[{"Numerator", "[", 
+          RowBox[{"expr", " ", 
+           RowBox[{"Sqrt", "[", "num", "]"}]}], "]"}]}], ",", 
+        "\[IndentingNewLine]", 
+        RowBox[{"denom1", "=", 
+         RowBox[{"Denominator", "[", 
+          RowBox[{"expr", " ", 
+           RowBox[{"Sqrt", "[", "num", "]"}]}], "]"}]}]}], 
+       "\[IndentingNewLine]", "}"}], ",", "\[IndentingNewLine]", 
+      RowBox[{"If", "[", 
+       RowBox[{
+        RowBox[{"Or", "[", 
+         RowBox[{
+          RowBox[{"!", "$TexFractionAsFraction"}], ",", 
+          RowBox[{"NumberQ", "[", "denom1", "]"}]}], "]"}], ",", 
+        "\[IndentingNewLine]", 
+        RowBox[{"StringJoin", "[", 
+         RowBox[{
+          RowBox[{"TexFracExpression", "[", 
+           RowBox[{
+            RowBox[{"Numerator", "[", "numfactor", "]"}], ",", 
+            RowBox[{
+             RowBox[{"Denominator", "[", "numfactor", "]"}], 
+             RowBox[{"Sqrt", "[", "num", "]"}]}], ",", "$TexSmallFraction"}], 
+           "]"}], ",", 
+          RowBox[{"TexFactor", "[", 
+           RowBox[{"expr", " ", 
+            RowBox[{
+             RowBox[{"Sqrt", "[", "num", "]"}], "/", "numfactor"}]}], "]"}]}],
+          "]"}], ",", "\[IndentingNewLine]", 
+        RowBox[{"TexFracExpression", "[", 
+         RowBox[{"numer", ",", 
+          RowBox[{"denom1", " ", 
+           RowBox[{"Sqrt", "[", "num", "]"}]}], ",", "$TexFraction"}], 
+         "]"}]}], "]"}]}], "\[IndentingNewLine]", "]"}]}], ";"}]}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", "Power", " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"TexOperator", "[", "Power", "]"}], ":=", "\"\<^\>\""}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"TexBase", "[", 
+      RowBox[{"x", ":", 
+       RowBox[{"(", 
+        RowBox[{"_Symbol", "|", "_Integer", "|", 
+         RowBox[{
+          RowBox[{"_", "?", "xTensorQ"}], "[", "___", "]"}]}], ")"}]}], "]"}],
+      ":=", 
+     RowBox[{"Tex", "[", "x", "]"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"TexBase", "[", "x_", "]"}], ":=", 
+     RowBox[{"StringJoin", "[", 
+      RowBox[{
+       RowBox[{"TexOpen", "[", "\"\<(\>\"", "]"}], ",", 
+       RowBox[{"Tex", "[", "x", "]"}], ",", 
+       RowBox[{"TexClose", "[", "\"\<)\>\"", "]"}]}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"TexExponent", "[", "x_", "]"}], ":=", 
+     RowBox[{"With", "[", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"tex", "=", 
+         RowBox[{"Tex", "[", "x", "]"}]}], "}"}], ",", 
+       RowBox[{"If", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"StringLength", "[", "tex", "]"}], "===", "1"}], ",", "tex",
+          ",", 
+         RowBox[{"StringJoin", "[", 
+          RowBox[{"\"\<{\>\"", ",", "tex", ",", "\"\<}\>\""}], "]"}]}], 
+        "]"}]}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"Tex", "[", 
+       RowBox[{"Power", "[", 
+        RowBox[{"x_", ",", 
+         RowBox[{"-", "1"}]}], "]"}], "]"}], ":=", 
+      RowBox[{
+       RowBox[{"StringJoin", "[", 
+        RowBox[{"\"\<\\\\frac{1}{\>\"", ",", 
+         RowBox[{"Tex", "[", "x", "]"}], ",", "\"\<}\>\""}], "]"}], "/;", 
+       RowBox[{
+        RowBox[{"ByteCount", "[", "x", "]"}], "<", "200"}]}]}], ";"}], "*)"}],
+    "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", 
+      RowBox[{"Power", "[", 
+       RowBox[{"x_", ",", 
+        RowBox[{"-", "1"}]}], "]"}], "]"}], ":=", 
+     RowBox[{
+      RowBox[{"TexFracExpression", "[", 
+       RowBox[{"1", ",", "x", ",", "$TexFraction"}], "]"}], "/;", 
+      "$TexFractionAsFraction"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", 
+      RowBox[{"Power", "[", 
+       RowBox[{"x_", ",", "n_"}], "]"}], "]"}], ":=", 
+     RowBox[{"StringJoin", "[", 
+      RowBox[{
+       RowBox[{"TexBase", "[", "x", "]"}], ",", 
+       RowBox[{"TexOperator", "[", "Power", "]"}], ",", 
+       RowBox[{"TexExponent", "[", "n", "]"}]}], "]"}]}], ";"}]}]}]], "Input",
+ 
+ InitializationCell->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["3.8. Tensors", "Subsection"],
+
+Cell["Jose\[CloseCurlyQuote]s old code on tensors:", "Text"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", "Tensors", " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", 
+      RowBox[{
+       RowBox[{"tensor_", "?", "xTensorQ"}], "[", "indices___", "]"}], "]"}], 
+     ":=", 
+     RowBox[{"TexTensorCombine", "[", 
+      RowBox[{
+       RowBox[{"Tex", "[", "tensor", "]"}], ",", 
+       RowBox[{"TexIndex", "/@", 
+        RowBox[{"IndexList", "[", "indices", "]"}]}]}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"TexTensorCombine", "[", 
+      RowBox[{"tensor_", ",", 
+       RowBox[{"IndexList", "[", "indices___", "]"}]}], "]"}], ":=", 
+     RowBox[{"StringJoin", "[", 
+      RowBox[{"tensor", ",", "indices"}], "]"}]}], ";"}]}]}]], "Input",
+ Evaluatable->False],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"New symbol created: \"\>", 
+   "\[InvisibleSpace]", "\<\"TexTensorCombine\"\>", 
+   "\[InvisibleSpace]", "\<\", Context: \"\>", 
+   "\[InvisibleSpace]", "\<\"xAct`xTensor`Private`\"\>"}],
+  SequenceForm[
+  "New symbol created: ", "TexTensorCombine", ", Context: ", 
+   "xAct`xTensor`Private`"],
+  Editable->False]], "Print"]
+}, Open  ]],
+
+Cell["\<\
+Thomas\[CloseCurlyQuote] code, producing less parenthesization:\
+\>", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", "Tensors", " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"Tex", "[", 
+     RowBox[{
+      RowBox[{"tensor_", "?", "xTensorQ"}], "[", "indices___", "]"}], "]"}], ":=", 
+    RowBox[{"StringJoin", "[", 
+     RowBox[{
+      RowBox[{"Tex", "[", "tensor", "]"}], ",", 
+      RowBox[{"TexIndices", "[", "indices", "]"}]}], "]"}]}], 
+   ";"}]}]], "Input",
+ InitializationCell->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["3.9. Scalar functions", "Subsection"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"Derivatives", " ", "of", " ", "scalar", " ", "functions"}], " ", 
+   "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"deriv", "[", 
+      RowBox[{"var_", ",", "1"}], "]"}], ":=", 
+     RowBox[{"\"\<\\\\partial \>\"", "<>", 
+      RowBox[{"Tex", "[", "var", "]"}]}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"deriv", "[", 
+      RowBox[{"var_", ",", "n_"}], "]"}], ":=", 
+     RowBox[{"\"\<\\\\partial^{\>\"", "<>", 
+      RowBox[{"Tex", "[", "n", "]"}], "<>", "\"\<}\>\"", "<>", 
+      RowBox[{"Tex", "[", "var", "]"}]}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"withrespectto", "[", 
+      RowBox[{"vars_List", ",", "ders_List"}], "]"}], ":=", 
+     RowBox[{"Inner", "[", 
+      RowBox[{"withrespectto", ",", "vars", ",", "ders", ",", "StringJoin"}], 
+      "]"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"withrespectto", "[", 
+      RowBox[{"var_", ",", "0"}], "]"}], ":=", "\"\<\>\""}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"withrespectto", "[", 
+      RowBox[{"var_", ",", "1"}], "]"}], ":=", 
+     RowBox[{"\"\<\\\\partial \>\"", "<>", 
+      RowBox[{"Tex", "[", "var", "]"}]}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"withrespectto", "[", 
+      RowBox[{"var_", ",", "n_"}], "]"}], ":=", 
+     RowBox[{"\"\<\\\\partial \>\"", "<>", 
+      RowBox[{"Tex", "[", "var", "]"}], "<>", "\"\<^{\>\"", "<>", 
+      RowBox[{"Tex", "[", "n", "]"}], "<>", "\"\<}\>\""}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Derivative", "[", "ders__", "]"}], "[", 
+        RowBox[{"f_", "?", "ScalarFunctionQ"}], "]"}], "[", "vars__", "]"}], 
+      "]"}], ":=", 
+     RowBox[{"\"\<\\\\frac{\>\"", "<>", 
+      RowBox[{"deriv", "[", 
+       RowBox[{
+        RowBox[{"f", "[", "vars", "]"}], ",", 
+        RowBox[{"Plus", "[", "ders", "]"}]}], "]"}], "<>", "\"\<}{\>\"", "<>", 
+      RowBox[{"withrespectto", "[", 
+       RowBox[{
+        RowBox[{"{", "vars", "}"}], ",", 
+        RowBox[{"{", "ders", "}"}]}], "]"}], "<>", "\"\<}\>\""}]}], 
+    ";"}]}]}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"Other", " ", "scalar", " ", "functions"}], " ", "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", 
+      RowBox[{
+       RowBox[{"f_", "?", "ScalarFunctionQ"}], "[", "args__", "]"}], "]"}], ":=", 
+     RowBox[{"StringJoin", "[", 
+      RowBox[{
+       RowBox[{"Tex", "[", "f", "]"}], ",", 
+       RowBox[{"TexOpen", "[", "\"\<(\>\"", "]"}], ",", 
+       RowBox[{"Sequence", "@@", 
+        RowBox[{"InsertComma", "[", 
+         RowBox[{"Tex", "/@", 
+          RowBox[{"{", "args", "}"}]}], "]"}]}], ",", 
+       RowBox[{"TexClose", "[", "\"\<)\>\"", "]"}]}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"InsertComma", "[", "arguments_List", "]"}], ":=", 
+     RowBox[{"Insert", "[", 
+      RowBox[{"arguments", ",", "\"\<, \>\"", ",", 
+       RowBox[{"List", "/@", 
+        RowBox[{"Range", "[", 
+         RowBox[{"2", ",", 
+          RowBox[{"Length", "[", "arguments", "]"}]}], "]"}]}]}], "]"}]}], 
+    ";"}]}]}]], "Input",
+ InitializationCell->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["3.10. Inert heads", "Subsection"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"Innert", " ", "heads"}], " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"Tex", "[", 
+     RowBox[{
+      RowBox[{"ih_", "?", "InertHeadQ"}], "[", 
+      RowBox[{"expr_", ",", "z___"}], "]"}], "]"}], ":=", 
+    RowBox[{"StringJoin", "[", 
+     RowBox[{
+      RowBox[{"Tex", "[", "ih", "]"}], ",", 
+      RowBox[{"TexOpen", "[", "\"\<[\>\"", "]"}], ",", 
+      RowBox[{"Tex", "[", "expr", "]"}], ",", 
+      RowBox[{"TexClose", "[", "\"\<]\>\"", "]"}]}], "]"}]}], 
+   ";"}]}]], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["3.11. Scalar expressions", "Subsection"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"Remove", " ", "the", " ", "Scalar", " ", "head"}], " ", "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"$TexScalarParentheses", "=", "True"}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", 
+      RowBox[{"Scalar", "[", "expr_", "]"}], "]"}], ":=", 
+     RowBox[{"If", "[", 
+      RowBox[{"$TexScalarParentheses", ",", "\[IndentingNewLine]", 
+       RowBox[{"StringJoin", "[", 
+        RowBox[{
+         RowBox[{"TexOpen", "[", "\"\<(\>\"", "]"}], ",", 
+         RowBox[{"Tex", "[", "expr", "]"}], ",", 
+         RowBox[{"TexClose", "[", "\"\<)\>\"", "]"}]}], "]"}], ",", 
+       "\[IndentingNewLine]", 
+       RowBox[{"Tex", "[", "expr", "]"}]}], "\[IndentingNewLine]", "]"}]}], 
+    ";"}]}]}]], "Input",
+ InitializationCell->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["3.12. Covariant derivatives", "Subsection"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"Covariant", " ", "derivatives"}], " ", "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"covd_Symbol", "?", "CovDQ"}], "[", "inds__", "]"}], "[", 
+       "expr_", "]"}], "]"}], ":=", 
+     RowBox[{"TexCovDCombine", "[", 
+      RowBox[{
+       RowBox[{"TexCovD", "[", "covd", "]"}], ",", 
+       RowBox[{"Tex", "[", "expr", "]"}], ",", 
+       RowBox[{"IndexList", "[", "inds", "]"}], ",", "$CovDFormat"}], "]"}]}],
+     ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", 
+      RowBox[{"CovD", "[", 
+       RowBox[{"expr_", ",", "ders___", ",", 
+        RowBox[{
+         RowBox[{"der_Symbol", "?", "CovDQ"}], "[", "inds__", "]"}]}], "]"}], 
+      "]"}], ":=", 
+     RowBox[{"TexCovDCombine", "[", 
+      RowBox[{
+       RowBox[{"TexCovD", "[", "covd", "]"}], ",", 
+       RowBox[{"Tex", "[", "expr", "]"}], ",", 
+       RowBox[{"IndexList", "[", "inds", "]"}], ",", "$CovDFormat"}], "]"}]}],
+     ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"TexCovDCombine", "[", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"post_", ",", "pre_"}], "}"}], ",", "exprstring_String", ",", 
+       "list_IndexList", ",", "\"\<Prefix\>\""}], "]"}], ":=", 
+     RowBox[{"StringJoin", "[", 
+      RowBox[{
+       RowBox[{"Tex", "@", "pre"}], ",", 
+       RowBox[{"TexIndices", "@@", "list"}], ",", "exprstring"}], "]"}]}], 
+    ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"TexCovDCombine", "[", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"post_", ",", "pre_"}], "}"}], ",", "exprstring_String", ",", 
+       "list_IndexList", ",", "\"\<Postfix\>\""}], "]"}], ":=", 
+     RowBox[{"StringJoin", "[", 
+      RowBox[{"exprstring", ",", 
+       RowBox[{
+        RowBox[{"TexCovDIndices", "[", 
+         RowBox[{"Tex", "@", "post"}], "]"}], "@@", "list"}]}], "]"}]}], 
+    ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"TexCovD", "[", "covd_", "]"}], ":=", 
+     RowBox[{"SymbolOfCovD", "[", "covd", "]"}]}], ";"}]}]}]], "Input",
+ InitializationCell->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["3.13. Lie derivatives", "Subsection"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"Lie", " ", "derivatives"}], " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"Tex", "[", 
+     RowBox[{
+      RowBox[{"LieD", "[", 
+       RowBox[{"n_Symbol", "[", "_", "]"}], "]"}], "[", "expr_", "]"}], "]"}],
+     ":=", 
+    RowBox[{"\"\<\\\\mathcal{L}_\>\"", "<>", 
+     RowBox[{"Tex", "[", "n", "]"}], "<>", 
+     RowBox[{"Tex", "[", "expr", "]"}]}]}], ";"}]}]], "Input",
+ InitializationCell->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["3.14. Parametric derivatives", "Subsection"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"Parametric", " ", "derivative"}], " ", "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"TexParamD", "[", 
+      RowBox[{"{", "ps_", "}"}], "]"}], ":=", 
+     RowBox[{"\"\<\\\\partial_\>\"", "<>", 
+      RowBox[{"Tex", "[", "ps", "]"}], "<>", "\"\< \>\""}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"TexParamD", "[", 
+      RowBox[{"ps", ":", 
+       RowBox[{"{", "__", "}"}]}], "]"}], ":=", 
+     RowBox[{"\"\<\\\\partial_\>\"", "<>", 
+      RowBox[{"Tex", "[", 
+       RowBox[{"First", "[", "ps", "]"}], "]"}], "<>", "\"\<^{\>\"", "<>", 
+      RowBox[{"ToString", "[", 
+       RowBox[{"Length", "[", "ps", "]"}], "]"}], "<>", "\"\<} \>\""}]}], 
+    ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Tex", "[", 
+      RowBox[{
+       RowBox[{"ParamD", "[", "ps__", "]"}], "[", "expr_", "]"}], "]"}], ":=", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{"$ParamDFormat", "==", "\"\<Postfix\>\""}], ",", 
+       "\[IndentingNewLine]", 
+       RowBox[{"StringJoin", "[", 
+        RowBox[{
+         RowBox[{"Tex", "[", "expr", "]"}], ",", "\"\<{}_{,\>\"", ",", 
+         RowBox[{"Sequence", "@@", 
+          RowBox[{"(", 
+           RowBox[{"Tex", "/@", 
+            RowBox[{"{", "ps", "}"}]}], ")"}]}], ",", "\"\<}\>\""}], "]"}], 
+       ",", 
+       RowBox[{
+        RowBox[{"Apply", "[", 
+         RowBox[{"StringJoin", ",", 
+          RowBox[{"TexParamD", "/@", 
+           RowBox[{"Split", "@", 
+            RowBox[{"Sort", "[", 
+             RowBox[{"{", "ps", "}"}], "]"}]}]}]}], "]"}], "<>", 
+        RowBox[{"Tex", "[", "expr", "]"}]}]}], "\[IndentingNewLine]", "]"}]}],
+     ";"}], "\[IndentingNewLine]", 
+   RowBox[{"(*", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"Tex", "[", 
+       RowBox[{
+        RowBox[{"ParamD", "[", "ps__", "]"}], "[", "expr_", "]"}], "]"}], ":=", 
+      RowBox[{
+       RowBox[{"Apply", "[", 
+        RowBox[{"StringJoin", ",", 
+         RowBox[{"TexParamD", "/@", 
+          RowBox[{"Split", "@", 
+           RowBox[{"Sort", "[", "ps", "]"}]}]}]}], "]"}], "<>", 
+       RowBox[{"TexOpen", "[", "\"\<[\>\"", "]"}], "<>", 
+       RowBox[{"Tex", "[", "expr", "]"}], "<>", 
+       RowBox[{"TexClose", "[", "\"\<]\>\"", "]"}]}]}], ";"}], 
+    "\[IndentingNewLine]", "*)"}]}]}]], "Input",
+ InitializationCell->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["3.15. Basis objects", "Subsection"],
+
+Cell[BoxData[
+ RowBox[{"(*", " ", "Basis", " ", "*)"}]], "Input",
+ InitializationCell->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["3.16. Equal", "Subsection"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", "Equal", " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"Tex", "[", 
+     RowBox[{"Equal", "[", 
+      RowBox[{"lhs_", ",", "rhs_"}], "]"}], "]"}], ":=", 
+    RowBox[{"StringJoin", "[", 
+     RowBox[{
+      RowBox[{"Tex", "[", "lhs", "]"}], ",", "\"\< = \>\"", ",", 
+      RowBox[{"Tex", "[", "rhs", "]"}]}], "]"}]}], ";"}]}]], "Input",
+ InitializationCell->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["3.17. The TexPrint function", "Subsection"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"$TexFixExtraRules", "=", 
+   RowBox[{"{", "}"}]}], ";"}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"Note", " ", "that", " ", "we", " ", "remove", " ", "the", " ", 
+    RowBox[{"dollars", "!"}], " ", "This", " ", "is", " ", "because", " ", 
+    "\[Mu]3", " ", "is", " ", "converted", " ", "into", " ", 
+    RowBox[{"$", "\\", "mu$3"}], " ", "for", " ", "instance"}], " ", "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"TexFix", "[", "string_String", "]"}], ":=", 
+    RowBox[{"StringReplace", "[", 
+     RowBox[{"string", ",", 
+      RowBox[{"Join", "[", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"\"\<+-\>\"", "\[Rule]", "\"\<-\>\""}], ",", 
+          RowBox[{"\"\<+ -\>\"", "\[Rule]", "\"\<- \>\""}], ",", 
+          RowBox[{"\"\< _\>\"", "->", "\"\<_\>\""}], ",", 
+          RowBox[{"\"\< ^\>\"", "->", "\"\<^\>\""}], ",", 
+          RowBox[{"\"\<  \>\"", "->", "\"\< \>\""}], ",", 
+          RowBox[{"\"\<$\>\"", "->", "\"\<\>\""}]}], "}"}], ",", 
+        "$TexFixExtraRules"}], "]"}]}], "]"}]}], ";"}]}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"Main", ".", " ", "Public"}], " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"TexPrint", "[", 
+     RowBox[{"expr_", ",", 
+      RowBox[{"initlevel_:", "Automatic"}]}], "]"}], ":=", 
+    RowBox[{"TexFix", "@", 
+     RowBox[{"TexParenthesis", "[", 
+      RowBox[{
+       RowBox[{"ScreenDollarIndices", "[", "expr", "]"}], ",", "initlevel"}], 
+      "]"}]}]}], ";"}]}]], "Input",
+ InitializationCell->True]
+}, Closed]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["4. SymManipulator", "Section",
+ FontColor->RGBColor[0, 0, 1]],
+
+Cell[CellGroupData[{
+
+Cell["4.1. Tex for SymH and CovarD", "Subsection"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Tex", "[", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"xAct`SymManipulator`SymH", "[", 
+      RowBox[{"headlist_", ",", "sym_", ",", "label_"}], "]"}], "?", 
+     "xTensorQ"}], "[", "inds___", "]"}], "]"}], ":=", 
+  RowBox[{"TexSymH", "[", 
+   RowBox[{
+    RowBox[{"xAct`SymManipulator`SymH", "[", 
+     RowBox[{"headlist", ",", "sym", ",", "label"}], "]"}], "[", "inds", 
+    "]"}], "]"}]}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"Tex", "[", 
+    RowBox[{"xAct`SymManipulator`CovarD", "[", 
+     RowBox[{
+      RowBox[{"D1_", "?", "CovDQ"}], ",", 
+      RowBox[{"T_", "?", "xTensorQ"}], ",", "list_"}], "]"}], "]"}], ":=", 
+   RowBox[{"StringJoin", "[", 
+    RowBox[{
+     RowBox[{"Tex", "[", 
+      RowBox[{"Last", "@", 
+       RowBox[{"SymbolOfCovD", "[", "D1", "]"}]}], "]"}], ",", 
+     RowBox[{"Tex", "[", "T", "]"}]}], "]"}]}], ";"}]], "Input",
+ InitializationCell->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["4.2. TexSymH", "Subsection"],
+
+Cell["\<\
+This is a new code that can handle all cases that are possible to write in a \
+nice way. The symmetries that are accepted are disjoint unions of symmetric \
+and antisymmetric groups. The indices belonging to one such disjoint subgroup \
+have to be all up or all down. If two disjoint subgroups are both acting on \
+up or down indices, they have to act on disjoint ranges of indices. If any of \
+these criteria fails, messages are printed, and the output is similar to the \
+display form. \
+\>", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"TexGroupSymbols", "[", 
+    RowBox[{"points_", ",", "sym_"}], "]"}], ":=", 
+   RowBox[{"Which", "[", 
+    RowBox[{
+     RowBox[{"xAct`SymManipulator`SubgroupQ", "[", 
+      RowBox[{
+       RowBox[{"Symmetric", "[", "points", "]"}], ",", "sym"}], "]"}], ",", 
+     RowBox[{"(*", " ", "Symmetric", " ", "*)"}], "\[IndentingNewLine]", 
+     RowBox[{"{", 
+      RowBox[{"\"\<(\>\"", ",", "\"\<)\>\""}], "}"}], ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{"xAct`SymManipulator`SubgroupQ", "[", 
+      RowBox[{
+       RowBox[{"Antisymmetric", "[", "points", "]"}], ",", "sym"}], "]"}], 
+     ",", 
+     RowBox[{"(*", " ", "Antisymmetric", " ", "*)"}], "\[IndentingNewLine]", 
+     RowBox[{"{", 
+      RowBox[{"\"\<[\>\"", ",", "\"\<]\>\""}], "}"}], ",", 
+     "\[IndentingNewLine]", "True", ",", 
+     RowBox[{"(*", " ", 
+      RowBox[{"Everything", " ", "else"}], " ", "*)"}], "\[IndentingNewLine]", 
+     RowBox[{"{", 
+      RowBox[{"\"\<Unkown\>\"", ",", "\"\<Unkown\>\""}], "}"}]}], "]"}]}], 
+  ";"}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"TexSymH", "[", 
+   RowBox[{"x", ":", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{"xAct`SymManipulator`SymH", "[", 
+       RowBox[{"headlist_", ",", "sym_", ",", "label_"}], "]"}], "[", 
+      "inds___", "]"}], ")"}]}], "]"}], ":=", 
+  RowBox[{"Module", "[", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"texfail", "=", "False"}], ",", 
+      RowBox[{"n", "=", 
+       RowBox[{"Length", "@", 
+        RowBox[{"List", "[", "inds", "]"}]}]}], ",", " ", 
+      RowBox[{"indlist", "=", 
+       RowBox[{"List", "@", "inds"}]}], ",", " ", "longorbits", ",", " ", 
+      "orbitgroupsymbols", ",", "orbitondowninds", ",", "orbitonupinds", ",", 
+      " ", "downsymorbits", ",", " ", "upsymorbits", ",", " ", 
+      "excludesymdowninds", ",", "excludesymupinds", ",", " ", 
+      "downindexslots", ",", " ", "beginsym", ",", " ", "endsym", ",", " ", 
+      "beginexclude", ",", " ", "endexclude", ",", " ", "preindexsymbolrules",
+       ",", " ", "postindexsymbolrules"}], "}"}], ",", "\[IndentingNewLine]", 
+    
+    RowBox[{
+     RowBox[{"longorbits", "=", 
+      RowBox[{"Sort", "/@", 
+       RowBox[{"Select", "[", 
+        RowBox[{
+         RowBox[{"Orbits", "[", 
+          RowBox[{"sym", ",", "n"}], "]"}], ",", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"Length", "[", "#", "]"}], ">", "1"}], "&"}]}], "]"}]}]}], 
+     ";", "\[IndentingNewLine]", 
+     RowBox[{"orbitgroupsymbols", "=", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"TexGroupSymbols", "[", 
+         RowBox[{"#", ",", "sym"}], "]"}], "&"}], "/@", "longorbits"}]}], ";",
+      "\[IndentingNewLine]", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Length", "@", 
+         RowBox[{"Select", "[", 
+          RowBox[{"orbitgroupsymbols", ",", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"First", "[", "#", "]"}], "===", "\"\<Unkown\>\""}], 
+            "&"}]}], "]"}]}], ">", "0"}], ",", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"texfail", "=", "True"}], ";", "\[IndentingNewLine]", 
+        RowBox[{
+        "Print", "[", 
+         "\"\<Not a disjoint union of symmetric and antisymmetric \
+groups.\>\"", "]"}], ";"}]}], "]"}], ";", "\[IndentingNewLine]", 
+     RowBox[{"downindexslots", "=", 
+      RowBox[{"Select", "[", 
+       RowBox[{
+        RowBox[{"Range", "[", 
+         RowBox[{"1", ",", 
+          RowBox[{"Length", "@", "indlist"}]}], "]"}], ",", 
+        RowBox[{
+         RowBox[{"DownIndexQ", "[", 
+          RowBox[{"indlist", "[", 
+           RowBox[{"[", "#", "]"}], "]"}], "]"}], "&"}]}], "]"}]}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"orbitondowninds", "=", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"xAct`SymManipulator`Private`SubsetQ", "[", 
+         RowBox[{"#", ",", "downindexslots"}], "]"}], "&"}], "/@", 
+       "longorbits"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"orbitonupinds", "=", 
+      RowBox[{
+       RowBox[{
+        RowBox[{
+         RowBox[{"Length", "[", 
+          RowBox[{"Intersection", "[", 
+           RowBox[{"#", ",", "downindexslots"}], "]"}], "]"}], "\[Equal]", 
+         "0"}], "&"}], "/@", "longorbits"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{"Not", "[", 
+        RowBox[{"And", "@@", 
+         RowBox[{"MapThread", "[", 
+          RowBox[{"Or", ",", 
+           RowBox[{"{", 
+            RowBox[{"orbitondowninds", ",", "orbitonupinds"}], "}"}]}], 
+          "]"}]}], "]"}], ",", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"texfail", "=", "True"}], ";", "\[IndentingNewLine]", 
+        RowBox[{
+        "Print", "[", "\"\<Not all indices are good positions.\>\"", 
+         "]"}]}]}], "]"}], ";", "\[IndentingNewLine]", 
+     RowBox[{"downsymorbits", "=", 
+      RowBox[{"Pick", "[", 
+       RowBox[{"longorbits", ",", "orbitondowninds"}], "]"}]}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"upsymorbits", "=", 
+      RowBox[{"Pick", "[", 
+       RowBox[{"longorbits", ",", "orbitonupinds"}], "]"}]}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{"Not", "@", 
+        RowBox[{"And", "[", 
+         RowBox[{
+          RowBox[{"OrderedQ", "[", 
+           RowBox[{"Join", "@@", "downsymorbits"}], "]"}], ",", 
+          RowBox[{"OrderedQ", "[", 
+           RowBox[{"Join", "@@", "upsymorbits"}], "]"}]}], "]"}]}], ",", 
+       "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"texfail", "=", "True"}], ";", "\[IndentingNewLine]", 
+        RowBox[{
+        "Print", "[", "\"\<The symmetries are overlapping.\>\"", "]"}]}]}], 
+      "]"}], ";", "\[IndentingNewLine]", 
+     RowBox[{"excludesymdowninds", "=", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Complement", "[", 
+         RowBox[{
+          RowBox[{"Range", "[", 
+           RowBox[{
+            RowBox[{"First", "@", "#"}], ",", 
+            RowBox[{"Last", "@", "#"}]}], "]"}], ",", "#"}], "]"}], "&"}], "/@",
+        "downsymorbits"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"excludesymdowninds", "=", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Intersection", "[", 
+         RowBox[{"#", ",", "downindexslots"}], "]"}], "&"}], "/@", 
+       "excludesymdowninds"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"excludesymupinds", "=", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Complement", "[", 
+         RowBox[{
+          RowBox[{"Range", "[", 
+           RowBox[{
+            RowBox[{"First", "@", "#"}], ",", 
+            RowBox[{"Last", "@", "#"}]}], "]"}], ",", "#"}], "]"}], "&"}], "/@",
+        "upsymorbits"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"excludesymupinds", "=", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Intersection", "[", 
+         RowBox[{"#", ",", 
+          RowBox[{"Complement", "[", 
+           RowBox[{
+            RowBox[{"Range", "@", "n"}], ",", "downindexslots"}], "]"}]}], 
+         "]"}], "&"}], "/@", "excludesymupinds"}]}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"beginsym", "=", 
+      RowBox[{"Join", "[", 
+       RowBox[{
+        RowBox[{"First", "/@", "downsymorbits"}], ",", 
+        RowBox[{"First", "/@", "upsymorbits"}]}], "]"}]}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"endsym", "=", 
+      RowBox[{"Join", "[", 
+       RowBox[{
+        RowBox[{"Last", "/@", "downsymorbits"}], ",", 
+        RowBox[{"Last", "/@", "upsymorbits"}]}], "]"}]}], ";", " ", 
+     "\[IndentingNewLine]", 
+     RowBox[{"beginexclude", "=", 
+      RowBox[{"Join", "[", 
+       RowBox[{
+        RowBox[{"First", "/@", 
+         RowBox[{"Select", "[", 
+          RowBox[{"excludesymdowninds", ",", 
+           RowBox[{
+            RowBox[{"(", 
+             RowBox[{
+              RowBox[{"Length", "@", "#"}], ">", "0"}], ")"}], "&"}]}], 
+          "]"}]}], ",", 
+        RowBox[{"First", "/@", 
+         RowBox[{"Select", "[", 
+          RowBox[{"excludesymupinds", ",", 
+           RowBox[{
+            RowBox[{"(", 
+             RowBox[{
+              RowBox[{"Length", "@", "#"}], ">", "0"}], ")"}], "&"}]}], 
+          "]"}]}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"endexclude", "=", 
+      RowBox[{"Join", "[", 
+       RowBox[{
+        RowBox[{"Last", "/@", 
+         RowBox[{"Select", "[", 
+          RowBox[{"excludesymdowninds", ",", 
+           RowBox[{
+            RowBox[{"(", 
+             RowBox[{
+              RowBox[{"Length", "@", "#"}], ">", "0"}], ")"}], "&"}]}], 
+          "]"}]}], ",", 
+        RowBox[{"Last", "/@", 
+         RowBox[{"Select", "[", 
+          RowBox[{"excludesymupinds", ",", 
+           RowBox[{
+            RowBox[{"(", 
+             RowBox[{
+              RowBox[{"Length", "@", "#"}], ">", "0"}], ")"}], "&"}]}], 
+          "]"}]}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"preindexsymbolrules", "=", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Rule", "[", 
+         RowBox[{"#", ",", 
+          RowBox[{"orbitgroupsymbols", "[", 
+           RowBox[{"[", 
+            RowBox[{
+             RowBox[{"First", "@", 
+              RowBox[{"First", "@", 
+               RowBox[{"Position", "[", 
+                RowBox[{"longorbits", ",", "#", ",", "2", ",", "1"}], 
+                "]"}]}]}], ",", "1"}], "]"}], "]"}]}], "]"}], "&"}], "/@", 
+       "beginsym"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"postindexsymbolrules", "=", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Rule", "[", 
+         RowBox[{"#", ",", 
+          RowBox[{"orbitgroupsymbols", "[", 
+           RowBox[{"[", 
+            RowBox[{
+             RowBox[{"First", "@", 
+              RowBox[{"First", "@", 
+               RowBox[{"Position", "[", 
+                RowBox[{"longorbits", ",", "#", ",", "2", ",", "1"}], 
+                "]"}]}]}], ",", "2"}], "]"}], "]"}]}], "]"}], "&"}], "/@", 
+       "endsym"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"preindexsymbolrules", "=", 
+      RowBox[{"Join", "[", 
+       RowBox[{"preindexsymbolrules", ",", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"Rule", "[", 
+           RowBox[{"#", ",", "\"\<|\>\""}], "]"}], "&"}], "/@", 
+         "beginexclude"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"postindexsymbolrules", "=", 
+      RowBox[{"Join", "[", 
+       RowBox[{"postindexsymbolrules", ",", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"Rule", "[", 
+           RowBox[{"#", ",", "\"\<|\>\""}], "]"}], "&"}], "/@", 
+         "endexclude"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"preindexsymbolrules", "=", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Rule", "[", 
+         RowBox[{"#", ",", 
+          RowBox[{
+           RowBox[{"(", 
+            RowBox[{"#", "/.", "preindexsymbolrules"}], ")"}], "/.", 
+           RowBox[{"Rule", "[", 
+            RowBox[{"#", ",", "\"\<\>\""}], "]"}]}]}], "]"}], "&"}], "/@", 
+       RowBox[{"Range", "[", "n", "]"}]}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"postindexsymbolrules", "=", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Rule", "[", 
+         RowBox[{"#", ",", 
+          RowBox[{
+           RowBox[{"(", 
+            RowBox[{"#", "/.", "postindexsymbolrules"}], ")"}], "/.", 
+           RowBox[{"Rule", "[", 
+            RowBox[{"#", ",", "\"\<\>\""}], "]"}]}]}], "]"}], "&"}], "/@", 
+       RowBox[{"Range", "[", "n", "]"}]}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"If", "[", 
+      RowBox[{"texfail", ",", 
+       RowBox[{
+        RowBox[{
+        "Print", "[", "\"\<Could not typset the SymH object nicely.\>\"", 
+         "]"}], ";", "\[IndentingNewLine]", 
+        RowBox[{"StringJoin", "[", 
+         RowBox[{
+         "\"\<\\\\underset{\>\"", ",", "label", ",", "\"\<}{Sym}(\>\"", ",", 
+          RowBox[{"TexPrint", "@", 
+           RowBox[{"xAct`SymManipulator`RemoveSym", "@", "x"}]}], ",", 
+          "\"\<)\>\""}], "]"}]}], ",", "\[IndentingNewLine]", 
+       RowBox[{"TexKnownSymH", "[", 
+        RowBox[{
+        "headlist", ",", "n", ",", " ", "indlist", ",", "preindexsymbolrules",
+          ",", " ", "postindexsymbolrules"}], "]"}]}], "]"}]}]}], 
+   "]"}]}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"TexKnownSymH", "[", 
+   RowBox[{
+   "headlist_", ",", "n_", ",", " ", "indlist_", ",", "preindexsymbolrules_", 
+    ",", " ", "postindexsymbolrules_"}], "]"}], ":=", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"numindices", "=", 
+       RowBox[{"Length", "/@", 
+        RowBox[{"SlotsOfTensor", "/@", "headlist"}]}]}], ",", 
+      "partitionedslots", ",", "internalexpr", ",", " ", "indicesoftensor", 
+      ",", " ", 
+      RowBox[{"texstring", "=", "\"\<\>\""}], ",", "  ", 
+      RowBox[{"texstringtensor", "=", "\"\<\>\""}], ",", " ", 
+      RowBox[{"i", "=", "1"}], ",", " ", "CovarDs", ",", " ", 
+      RowBox[{"newheadlist", "=", "headlist"}]}], "}"}], ",", 
+    "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"CovarDs", "=", 
+      RowBox[{"First", "/@", 
+       RowBox[{"Position", "[", 
+        RowBox[{"newheadlist", ",", "xAct`SymManipulator`CovarD", ",", "2"}], 
+        "]"}]}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"While", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Length", "@", "CovarDs"}], ">", "0"}], ",", 
+       "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"numindices", "=", 
+         RowBox[{"ReplacePart", "[", 
+          RowBox[{"numindices", ",", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"(", 
+              RowBox[{"#", "\[Rule]", 
+               RowBox[{"Sequence", "[", 
+                RowBox[{
+                 RowBox[{"Length", "@", 
+                  RowBox[{"newheadlist", "[", 
+                   RowBox[{"[", 
+                    RowBox[{"#", ",", "3"}], "]"}], "]"}]}], ",", 
+                 RowBox[{
+                  RowBox[{"numindices", "[", 
+                   RowBox[{"[", "#", "]"}], "]"}], "-", 
+                  RowBox[{"Length", "@", 
+                   RowBox[{"newheadlist", "[", 
+                    RowBox[{"[", 
+                    RowBox[{"#", ",", "3"}], "]"}], "]"}]}]}]}], "]"}]}], 
+              ")"}], "&"}], "/@", "CovarDs"}]}], "]"}]}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"newheadlist", "=", 
+         RowBox[{"ReplacePart", "[", 
+          RowBox[{"newheadlist", ",", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"(", 
+              RowBox[{"#", "\[Rule]", 
+               RowBox[{"Sequence", "[", 
+                RowBox[{
+                 RowBox[{"Last", "@", 
+                  RowBox[{"SymbolOfCovD", "@", 
+                   RowBox[{"newheadlist", "[", 
+                    RowBox[{"[", 
+                    RowBox[{"#", ",", "1"}], "]"}], "]"}]}]}], ",", 
+                 RowBox[{"newheadlist", "[", 
+                  RowBox[{"[", 
+                   RowBox[{"#", ",", "2"}], "]"}], "]"}]}], "]"}]}], ")"}], 
+             "&"}], "/@", "CovarDs"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+        
+        RowBox[{"CovarDs", "=", 
+         RowBox[{"First", "/@", 
+          RowBox[{"Position", "[", 
+           RowBox[{
+           "newheadlist", ",", "xAct`SymManipulator`CovarD", ",", "2"}], 
+           "]"}]}]}], ";"}]}], "\[IndentingNewLine]", "]"}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"(*", " ", 
+      RowBox[{
+      "Extract", " ", "indices", " ", "belonging", " ", "to", " ", "the", " ",
+        "different", " ", 
+       RowBox[{"tensors", ".", " ", "Can"}], " ", "this", " ", "be", " ", 
+       "done", " ", "in", " ", "a", " ", "simpler", " ", 
+       RowBox[{"way", "?"}]}], " ", "*)"}], "\[IndentingNewLine]", 
+     RowBox[{"partitionedslots", "=", 
+      RowBox[{"Last", "/@", 
+       RowBox[{"Rest", "@", 
+        RowBox[{"FoldList", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{
+             RowBox[{"Drop", "[", 
+              RowBox[{
+               RowBox[{"#1", "[", 
+                RowBox[{"[", "1", "]"}], "]"}], ",", "#2"}], "]"}], ",", 
+             RowBox[{"Take", "[", 
+              RowBox[{
+               RowBox[{"#1", "[", 
+                RowBox[{"[", "1", "]"}], "]"}], ",", "#2"}], "]"}]}], "}"}], 
+           "&"}], ",", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"Range", "[", "n", "]"}], ",", 
+            RowBox[{"{", "}"}]}], "}"}], ",", "numindices"}], "]"}]}]}]}], 
+     ";", "\[IndentingNewLine]", 
+     RowBox[{"indicesoftensor", "=", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"indlist", "[", 
+         RowBox[{"[", "#", "]"}], "]"}], "&"}], "/@", "partitionedslots"}]}], 
+     ";", "\[IndentingNewLine]", 
+     RowBox[{"While", "[", 
+      RowBox[{
+       RowBox[{"i", "\[LessEqual]", 
+        RowBox[{"Length", "@", "newheadlist"}]}], ",", "\[IndentingNewLine]", 
+       
+       RowBox[{
+        RowBox[{"texstringtensor", "=", " ", 
+         RowBox[{"TexTensorWithSym", "[", 
+          RowBox[{
+           RowBox[{"newheadlist", "[", 
+            RowBox[{"[", "i", "]"}], "]"}], ",", 
+           RowBox[{"indicesoftensor", "[", 
+            RowBox[{"[", "i", "]"}], "]"}], ",", 
+           RowBox[{"partitionedslots", "[", 
+            RowBox[{"[", "i", "]"}], "]"}], " ", ",", "preindexsymbolrules", 
+           ",", " ", "postindexsymbolrules"}], "]"}]}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"texstring", "=", 
+         RowBox[{"StringJoin", "[", 
+          RowBox[{"texstring", ",", "texstringtensor"}], "]"}]}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"i", "=", 
+         RowBox[{"i", "+", "1"}]}]}]}], "]"}], ";", "\[IndentingNewLine]", 
+     "texstring"}]}], "]"}]}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"TexTensorWithSym", "[", 
+   RowBox[{
+   "head_", ",", "inds_", ",", "slots_", ",", "preindexsymbolrules_", ",", 
+    " ", "postindexsymbolrules_"}], "]"}], ":=", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"texstring", "=", 
+       RowBox[{"Tex", "@", "head"}]}], ",", " ", 
+      RowBox[{"i", "=", "1"}], ",", " ", "fromdown", ",", 
+      RowBox[{"postindexsymbol", "=", "\"\<\>\""}]}], "}"}], ",", 
+    "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"While", "[", 
+      RowBox[{
+       RowBox[{"i", "\[LessEqual]", 
+        RowBox[{"Length", "[", "inds", "]"}]}], ",", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"texstring", "=", 
+         RowBox[{"StringJoin", "[", 
+          RowBox[{"texstring", ",", 
+           RowBox[{"TexSymIndex", "[", 
+            RowBox[{
+             RowBox[{"inds", "[", 
+              RowBox[{"[", "i", "]"}], "]"}], ",", 
+             RowBox[{"i", "\[Equal]", "1"}], ",", "fromdown", ",", 
+             RowBox[{
+              RowBox[{"slots", "[", 
+               RowBox[{"[", "i", "]"}], "]"}], "/.", 
+              "preindexsymbolrules"}]}], "]"}]}], "]"}]}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"fromdown", "=", 
+         RowBox[{"DownIndexQ", "[", 
+          RowBox[{"inds", "[", 
+           RowBox[{"[", "i", "]"}], "]"}], "]"}]}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"postindexsymbol", "=", 
+         RowBox[{
+          RowBox[{"slots", "[", 
+           RowBox[{"[", "i", "]"}], "]"}], "/.", "postindexsymbolrules"}]}], 
+        ";", "\[IndentingNewLine]", 
+        RowBox[{"texstring", "=", 
+         RowBox[{"StringJoin", "[", 
+          RowBox[{"texstring", ",", "postindexsymbol"}], "]"}]}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"i", "=", 
+         RowBox[{"i", "+", "1"}]}], ";"}]}], "]"}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Length", "@", "inds"}], ">", "0"}], ",", " ", 
+       RowBox[{"texstring", "=", 
+        RowBox[{"StringJoin", "[", 
+         RowBox[{"texstring", ",", "\"\<}\>\""}], "]"}]}]}], "]"}], ";", 
+     "\[IndentingNewLine]", "texstring"}]}], "]"}]}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"TexSymIndex", "[", 
+   RowBox[{
+   "index_", ",", "firstindexQ_", ",", "fromdownQ_", ",", "preindexsymbol_"}],
+    "]"}], ":=", "\[IndentingNewLine]", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", "indexstring", "}"}], ",", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"indexstring", "=", 
+      RowBox[{"Which", "[", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"firstindexQ", "&&", 
+         RowBox[{"DownIndexQ", "[", "index", "]"}], "&&", 
+         RowBox[{"Not", "[", "$TexPrintInitialBracesQ", "]"}]}], ",", 
+        "\"\<_{\>\"", ",", "\[IndentingNewLine]", 
+        RowBox[{"firstindexQ", "&&", 
+         RowBox[{"DownIndexQ", "[", "index", "]"}], "&&", 
+         "$TexPrintInitialBracesQ"}], ",", "\"\<{}_{\>\"", ",", 
+        "\[IndentingNewLine]", 
+        RowBox[{"firstindexQ", "&&", 
+         RowBox[{"Not", "[", "$TexPrintInitialBracesQ", "]"}]}], ",", 
+        "\"\<^{\>\"", ",", "\[IndentingNewLine]", 
+        RowBox[{"firstindexQ", "&&", "$TexPrintInitialBracesQ"}], ",", 
+        "\"\<{}^{\>\"", ",", "\[IndentingNewLine]", 
+        RowBox[{"fromdownQ", "&&", 
+         RowBox[{"DownIndexQ", "[", "index", "]"}]}], ",", "\"\<\>\"", ",", 
+        "\[IndentingNewLine]", "fromdownQ", ",", "\"\<}{}^{\>\"", ",", 
+        "\[IndentingNewLine]", 
+        RowBox[{"DownIndexQ", "[", "index", "]"}], ",", "\"\<}{}_{\>\"", ",", 
+        "\[IndentingNewLine]", "True", ",", "\"\<\>\""}], "]"}]}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"StringJoin", "[", 
+      RowBox[{"indexstring", ",", "preindexsymbol", ",", 
+       RowBox[{"TexUpIndex", "[", 
+        RowBox[{"UpIndex", " ", "@", "index"}], "]"}]}], "]"}]}]}], 
+   "]"}]}]], "Input",
+ InitializationCell->True]
+}, Closed]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["5. TexBreak", "Section",
+ FontColor->RGBColor[0, 0, 1]],
+
+Cell[CellGroupData[{
+
+Cell["5.1. TexBreak function", "Subsection"],
+
+Cell["Jose\[CloseCurlyQuote]s old code for TexBreak:", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"TexBreak", "[", 
+    RowBox[{"string_String", ",", "n_Integer"}], "]"}], ":=", 
+   RowBox[{"StringInsert", "[", 
+    RowBox[{"string", ",", "\"\< \\\\nonumber \\\\\\\\ \\n\>\"", ",", 
+     RowBox[{"Last", "/@", 
+      RowBox[{"Split", "[", 
+       RowBox[{
+        RowBox[{"First", "/@", 
+         RowBox[{"StringPosition", "[", 
+          RowBox[{"string", ",", 
+           RowBox[{"\"\< + \>\"", "|", "\"\< - \>\""}]}], "]"}]}], ",", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"IntegerPart", "[", 
+           RowBox[{"#1", "/", "n"}], "]"}], "===", 
+          RowBox[{"IntegerPart", "[", 
+           RowBox[{"#2", "/", "n"}], "]"}]}], "&"}]}], "]"}]}]}], "]"}]}], 
+  ";"}]], "Input",
+ Evaluatable->False],
+
+Cell["Barry\[CloseCurlyQuote]s new code:", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"Options", "[", "TexBreak", "]"}], "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"TexBreakBy", "->", "\"\<Character\>\""}], ",", 
+     RowBox[{"TexBreakAt", "->", 
+      RowBox[{"\"\< + \>\"", "|", "\"\< - \>\""}]}], ",", 
+     RowBox[{
+     "TexBreakString", "->", "\"\< \\\\nonumber \\\\\\\\ \\n&&\>\""}]}], 
+    "}"}]}], ";"}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"TexBreak", "[", 
+     RowBox[{
+     "string_String", ",", "n_Integer", ",", "l_List", ",", "options___"}], 
+     "]"}], ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+       "splittablePositions", ",", "breakat", ",", "breakby", ",", 
+        "breakstring", ",", "splitat", ",", "positions", ",", "perLine"}], 
+       "}"}], ",", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"breakat", ",", "breakby", ",", "breakstring"}], "}"}], "=", 
+        
+        RowBox[{
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{"TexBreakAt", ",", "TexBreakBy", ",", "TexBreakString"}], 
+           "}"}], "/.", 
+          RowBox[{"CheckOptions", "[", "options", "]"}]}], "/.", 
+         RowBox[{"Options", "[", "TexBreak", "]"}]}]}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"(*", " ", 
+        RowBox[{
+        "Positions", " ", "where", " ", "the", " ", "string", " ", "can", " ",
+          "be", " ", 
+         RowBox[{"split", ":", " ", 
+          RowBox[{"wherever", " ", "+", " ", "or", " ", "-", " ", 
+           RowBox[{"is", " ", "encountered"}]}]}]}], " ", "*)"}], 
+       "\[IndentingNewLine]", 
+       RowBox[{"splittablePositions", "=", 
+        RowBox[{"First", "/@", 
+         RowBox[{"StringPosition", "[", 
+          RowBox[{"string", ",", "breakat"}], "]"}]}]}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"(*", " ", 
+        RowBox[{"The", " ", 
+         RowBox[{"terms", "/", "characters"}], " ", "per", " ", "line", " ", 
+         "that", " ", "the", " ", "user", " ", "specified"}], " ", "*)"}], 
+       "\[IndentingNewLine]", 
+       RowBox[{"If", "[", 
+        RowBox[{
+         RowBox[{"l", "\[NotEqual]", 
+          RowBox[{"{", "}"}]}], ",", 
+         RowBox[{"perLine", "=", 
+          RowBox[{"SparseArray", "[", 
+           RowBox[{"l", ",", "Automatic", ",", "n"}], "]"}]}], ",", 
+         RowBox[{"perLine", "=", 
+          RowBox[{"{", "n", "}"}]}]}], "]"}], ";", "\[IndentingNewLine]", 
+       "\[IndentingNewLine]", 
+       RowBox[{"(*", " ", 
+        RowBox[{
+        "Positions", " ", "at", " ", "which", " ", "the", " ", "string", " ", 
+         "will", " ", "be", " ", "split"}], " ", "*)"}], 
+       "\[IndentingNewLine]", 
+       RowBox[{"Switch", "[", 
+        RowBox[{
+        "breakby", ",", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+         "\"\<Character\>\"", ",", "\[IndentingNewLine]", 
+         RowBox[{
+          RowBox[{"positions", "=", 
+           RowBox[{"{", "}"}]}], ";", "\[IndentingNewLine]", 
+          RowBox[{"Module", "[", 
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{"iter", ",", 
+              RowBox[{"currentPosition", "=", "0"}], ",", "nearestPosition", 
+              ",", 
+              RowBox[{"strlen", "=", 
+               RowBox[{"StringLength", "[", "string", "]"}]}]}], "}"}], ",", 
+            "\[IndentingNewLine]", 
+            RowBox[{"(*", " ", 
+             RowBox[{
+             "Split", " ", "parts", " ", "where", " ", "lengths", " ", "are", 
+              " ", "given", " ", "explicitly"}], " ", "*)"}], 
+            RowBox[{
+             RowBox[{"For", "[", 
+              RowBox[{
+               RowBox[{"iter", "=", "1"}], ",", 
+               RowBox[{
+                RowBox[{"(", 
+                 RowBox[{"iter", "\[LessEqual]", 
+                  RowBox[{"Length", "[", "perLine", "]"}]}], ")"}], "&&", 
+                RowBox[{"(", 
+                 RowBox[{
+                  RowBox[{"currentPosition", "+", 
+                   RowBox[{"perLine", "[", 
+                    RowBox[{"[", "iter", "]"}], "]"}]}], "<", "strlen"}], 
+                 ")"}]}], ",", 
+               RowBox[{"iter", "++"}], ",", "\[IndentingNewLine]", 
+               "\[IndentingNewLine]", 
+               RowBox[{
+                RowBox[{"nearestPosition", "=", 
+                 RowBox[{"Nearest", "[", 
+                  RowBox[{
+                   RowBox[{"Select", "[", 
+                    RowBox[{
+                    RowBox[{"splittablePositions", "-", "currentPosition"}], 
+                    ",", "Positive"}], "]"}], ",", 
+                   RowBox[{"perLine", "[", 
+                    RowBox[{"[", "iter", "]"}], "]"}]}], "]"}]}], ";", 
+                "\[IndentingNewLine]", "\[IndentingNewLine]", 
+                RowBox[{"If", "[", 
+                 RowBox[{
+                  RowBox[{"nearestPosition", "\[NotEqual]", 
+                   RowBox[{"{", "}"}]}], ",", "\[IndentingNewLine]", 
+                  RowBox[{
+                   RowBox[{"currentPosition", "+=", 
+                    RowBox[{"First", "@", "nearestPosition"}]}], ";", 
+                   "\[IndentingNewLine]", 
+                   RowBox[{"AppendTo", "[", 
+                    RowBox[{"positions", ",", "currentPosition"}], "]"}]}], 
+                  ",", "\[IndentingNewLine]", 
+                  RowBox[{"currentPosition", "=", "strlen"}]}], 
+                 "\[IndentingNewLine]", "]"}], ";"}]}], "\[IndentingNewLine]",
+               "]"}], ";", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+             RowBox[{"(*", 
+              RowBox[{" ", 
+               RowBox[{
+               "Split", " ", "remainder", " ", "into", " ", "strings", " ", 
+                "of", " ", 
+                RowBox[{"length", "~", "n"}]}], ")"}], " ", "*)"}], 
+             RowBox[{"While", "[", 
+              RowBox[{
+               RowBox[{"(", 
+                RowBox[{
+                 RowBox[{"currentPosition", "+", "n"}], "<", "strlen"}], 
+                ")"}], ",", 
+               RowBox[{
+                RowBox[{"nearestPosition", "=", 
+                 RowBox[{"Nearest", "[", 
+                  RowBox[{
+                   RowBox[{"Select", "[", 
+                    RowBox[{
+                    RowBox[{"splittablePositions", "-", "currentPosition"}], 
+                    ",", "Positive"}], "]"}], ",", "n"}], "]"}]}], ";", 
+                "\[IndentingNewLine]", 
+                RowBox[{"If", "[", 
+                 RowBox[{
+                  RowBox[{"nearestPosition", "\[NotEqual]", 
+                   RowBox[{"{", "}"}]}], ",", "\[IndentingNewLine]", 
+                  RowBox[{
+                   RowBox[{"currentPosition", "+=", 
+                    RowBox[{"First", "@", "nearestPosition"}]}], ";", 
+                   "\[IndentingNewLine]", 
+                   RowBox[{"AppendTo", "[", 
+                    RowBox[{"positions", ",", "currentPosition"}], "]"}]}], 
+                  ",", "\[IndentingNewLine]", 
+                  RowBox[{"currentPosition", "=", "strlen"}]}], 
+                 "\[IndentingNewLine]", "]"}], ";"}]}], "\[IndentingNewLine]",
+               "]"}], ";"}]}], "\[IndentingNewLine]", "]"}]}], ",", 
+         "\[IndentingNewLine]", "\[IndentingNewLine]", "\"\<Term\>\"", ",", 
+         "\[IndentingNewLine]", 
+         RowBox[{"(*", " ", 
+          RowBox[{
+          "The", " ", "terms", " ", "at", " ", "which", " ", "we", " ", 
+           "want", " ", "to", " ", "split"}], " ", "*)"}], 
+         "\[IndentingNewLine]", 
+         RowBox[{
+          RowBox[{"splitat", "=", 
+           RowBox[{"Accumulate", "[", "perLine", "]"}]}], ";", 
+          "\[IndentingNewLine]", "\[IndentingNewLine]", 
+          RowBox[{"(*", " ", 
+           RowBox[{"Pad", " ", "out", " ", "every", " ", "n", " ", "terms"}], 
+           " ", "*)"}], 
+          RowBox[{"splitat", "=", 
+           RowBox[{"Flatten", "[", 
+            RowBox[{"AppendTo", "[", 
+             RowBox[{"splitat", ",", 
+              RowBox[{"Range", "[", 
+               RowBox[{
+                RowBox[{
+                 RowBox[{"Last", "[", "splitat", "]"}], "+", "n"}], ",", 
+                RowBox[{"Length", "[", "splittablePositions", "]"}], ",", 
+                "n"}], "]"}]}], "]"}], "]"}]}], ";", "\[IndentingNewLine]", 
+          "\[IndentingNewLine]", 
+          RowBox[{"(*", " ", 
+           RowBox[{
+           "Remove", " ", "split", " ", "points", " ", "which", " ", "are", 
+            " ", "past", " ", "the", " ", "end", " ", "of", " ", "the", " ", 
+            "string"}], " ", "*)"}], 
+          RowBox[{"splitat", "=", 
+           RowBox[{"Select", "[", 
+            RowBox[{"splitat", ",", 
+             RowBox[{
+              RowBox[{"#", "\[LessEqual]", 
+               RowBox[{"Length", "[", "splittablePositions", "]"}]}], "&"}]}],
+             "]"}]}], ";", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+          RowBox[{"(*", " ", 
+           RowBox[{
+           "The", " ", "positions", " ", "in", " ", "the", " ", "string", " ",
+             "to", " ", "split", " ", "at"}], " ", "*)"}], 
+          "\[IndentingNewLine]", 
+          RowBox[{"positions", "=", 
+           RowBox[{"Map", "[", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"Part", "[", 
+               RowBox[{"splittablePositions", ",", "#"}], "]"}], "&"}], ",", 
+             "splitat"}], "]"}]}], ";"}], ",", "\[IndentingNewLine]", 
+         "\[IndentingNewLine]", "_", ",", "\[IndentingNewLine]", 
+         RowBox[{
+         "Throw", "[", "\"\<Invalid value for option TexBreakBy.\>\"", 
+          "]"}]}], "\[IndentingNewLine]", "\[IndentingNewLine]", "]"}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"(*", " ", 
+        RowBox[{"Split", " ", "string"}], " ", "*)"}], "\[IndentingNewLine]", 
+       
+       RowBox[{"StringInsert", "[", 
+        RowBox[{"string", ",", "breakstring", ",", "positions"}], "]"}]}]}], 
+     "\[IndentingNewLine]", "]"}]}], ";"}], "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{"Shortcuts", " ", "and", " ", "defaults"}], " ", 
+   "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"TexBreak", "[", 
+    RowBox[{"string_String", ",", "n_Integer", ",", "options___"}], "]"}], ":=", 
+   RowBox[{"TexBreak", "[", 
+    RowBox[{"string", ",", "n", ",", 
+     RowBox[{"{", "}"}], ",", "options"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"TexBreak", "[", 
+    RowBox[{"string_String", ",", "options___"}], "]"}], ":=", 
+   RowBox[{"TexBreak", "[", 
+    RowBox[{"string", ",", "200", ",", 
+     RowBox[{"{", "}"}], ",", "options"}], "]"}]}], ";"}]}], "Input",
+ InitializationCell->True]
+}, Closed]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["6. EndPackage", "Section",
+ FontColor->RGBColor[0, 0, 1]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"End", "[", "]"}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData["\<\"xAct`TexAct`Private`\"\>"], "Output"]
+}, Open  ]],
+
+Cell[BoxData[
+ RowBox[{"EndPackage", "[", "]"}]], "Input",
+ InitializationCell->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["7. Examples", "Section",
+ FontColor->RGBColor[0, 0, 1]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"DefManifold", "[", 
+  RowBox[{"M4", ",", "4", ",", 
+   RowBox[{"{", 
+    RowBox[{"a", ",", "b", ",", "c", ",", "d", ",", "e", ",", "f", ",", "g"}],
+     "}"}]}], "]"}]], "Input"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "DefManifold", 
+   "\[InvisibleSpace]", "\<\": Defining \"\>", 
+   "\[InvisibleSpace]", "\<\"manifold \"\>", "\[InvisibleSpace]", "M4", 
+   "\[InvisibleSpace]", "\<\". \"\>", "\[InvisibleSpace]", "\<\"\"\>"}],
+  SequenceForm[
+  "** ", xAct`xTensor`DefManifold, ": Defining ", 
+   "manifold ", $CellContext`M4, ". ", ""],
+  Editable->False]], "Print"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "DefVBundle", 
+   "\[InvisibleSpace]", "\<\": Defining \"\>", 
+   "\[InvisibleSpace]", "\<\"vbundle \"\>", "\[InvisibleSpace]", "TangentM4", 
+   "\[InvisibleSpace]", "\<\". \"\>", "\[InvisibleSpace]", "\<\"\"\>"}],
+  SequenceForm[
+  "** ", xAct`xTensor`DefVBundle, ": Defining ", 
+   "vbundle ", $CellContext`TangentM4, ". ", ""],
+  Editable->False]], "Print"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"DefTensor", "[", 
+  RowBox[{
+   RowBox[{"T", "[", 
+    RowBox[{"a", ",", "b", ",", "c"}], "]"}], ",", "M4", ",", 
+   RowBox[{"PrintAs", "->", "\"\<\[Tau]\>\""}]}], "]"}]], "Input"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "DefTensor", 
+   "\[InvisibleSpace]", "\<\": Defining \"\>", 
+   "\[InvisibleSpace]", "\<\"tensor \"\>", "\[InvisibleSpace]", 
+   RowBox[{"T", "[", 
+    RowBox[{"a", ",", "b", ",", "c"}], "]"}], 
+   "\[InvisibleSpace]", "\<\". \"\>", "\[InvisibleSpace]", "\<\"\"\>"}],
+  SequenceForm["** ", xAct`xTensor`DefTensor, ": Defining ", "tensor ", 
+   $CellContext`T[$CellContext`a, $CellContext`b, $CellContext`c], ". ", ""],
+  Editable->False]], "Print"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"-", "3"}], 
+   RowBox[{"T", "[", 
+    RowBox[{"a", ",", 
+     RowBox[{"-", "b"}], ",", "c"}], "]"}]}], "+", 
+  RowBox[{"7", 
+   RowBox[{"T", "[", 
+    RowBox[{"d", ",", "f"}], "]"}]}], "+", 
+  RowBox[{"Pi", " ", 
+   RowBox[{"T", "[", 
+    RowBox[{"g", ",", "f"}], "]"}]}], "-", "5"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"-", "5"}], "+", 
+  RowBox[{"7", " ", 
+   InterpretationBox[
+    StyleBox[GridBox[{
+       {"\[Tau]", 
+        StyleBox[GridBox[{
+           {"d", "f"},
+           {" ", " "}
+          },
+          GridBoxSpacings->{"Columns" -> {
+              Offset[0.], {
+               Offset[0.034999999999999996`]}, 
+              Offset[0.]}, "ColumnsIndexed" -> {}, "Rows" -> {{
+               Offset[0.]}}, "RowsIndexed" -> {}}],
+         FontSize->9]}
+      },
+      GridBoxAlignment->{
+       "Columns" -> {{Center}}, "ColumnsIndexed" -> {}, "Rows" -> {{Center}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.034999999999999996`]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.4]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}}],
+     ShowAutoStyles->False,
+     AutoSpacing->False],
+    $CellContext`T[$CellContext`d, $CellContext`f],
+    Editable->False]}], "+", 
+  RowBox[{"\[Pi]", " ", 
+   InterpretationBox[
+    StyleBox[GridBox[{
+       {"\[Tau]", 
+        StyleBox[GridBox[{
+           {"g", "f"},
+           {" ", " "}
+          },
+          GridBoxSpacings->{"Columns" -> {
+              Offset[0.], {
+               Offset[0.034999999999999996`]}, 
+              Offset[0.]}, "ColumnsIndexed" -> {}, "Rows" -> {{
+               Offset[0.]}}, "RowsIndexed" -> {}}],
+         FontSize->9]}
+      },
+      GridBoxAlignment->{
+       "Columns" -> {{Center}}, "ColumnsIndexed" -> {}, "Rows" -> {{Center}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.034999999999999996`]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.4]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}}],
+     ShowAutoStyles->False,
+     AutoSpacing->False],
+    $CellContext`T[$CellContext`g, $CellContext`f],
+    Editable->False]}], "-", 
+  RowBox[{"3", " ", 
+   InterpretationBox[
+    StyleBox[GridBox[{
+       {"\[Tau]", 
+        StyleBox[GridBox[{
+           {"a", " ", "c"},
+           {" ", "b", " "}
+          },
+          GridBoxSpacings->{"Columns" -> {
+              Offset[0.], {
+               Offset[0.034999999999999996`]}, 
+              Offset[0.]}, "ColumnsIndexed" -> {}, "Rows" -> {{
+               Offset[0.]}}, "RowsIndexed" -> {}}],
+         FontSize->9]}
+      },
+      GridBoxAlignment->{
+       "Columns" -> {{Center}}, "ColumnsIndexed" -> {}, "Rows" -> {{Center}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.034999999999999996`]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.4]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}}],
+     ShowAutoStyles->False,
+     AutoSpacing->False],
+    $CellContext`T[$CellContext`a, -$CellContext`b, $CellContext`c],
+    Editable->False]}]}]], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Tex", "[", "%", "]"}]], "Input"],
+
+Cell[BoxData["\<\"-5 + 7 \\\\tau^{df} + \\\\pi \\\\tau^{gf} + -3 \
+\\\\tau^{a}{}_{b}{}^{c}\"\>"], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TexPrint", "[", "%%", "]"}]], "Input"],
+
+Cell[BoxData["\<\"-5 + 7 \\\\tau^{df} + \\\\pi \\\\tau^{gf} - 3 \
+\\\\tau^{a}{}_{b}{}^{c}\"\>"], "Output"]
+}, Open  ]],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"$CovDFormat", "=", "\"\<Prefix\>\""}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"CovDQ", "[", "CD", "]"}], "^=", "True"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"SymbolOfCovD", "[", "CD", "]"}], "^=", 
+   RowBox[{"{", 
+    RowBox[{"\"\<;\>\"", ",", "\"\<D\>\""}], "}"}]}], ";"}]}], "Input"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TexPrint", "[", 
+  RowBox[{
+   RowBox[{"CD", "[", 
+    RowBox[{"-", "a"}], "]"}], "[", 
+   RowBox[{"T", "[", 
+    RowBox[{"b", ",", 
+     RowBox[{"-", "c"}]}], "]"}], "]"}], "]"}]], "Input"],
+
+Cell[BoxData["\<\"D_{a}\\\\tau^{b}{}_{c}\"\>"], "Output"]
+}, Open  ]],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"$CovDFormat", "=", "\"\<Postfix\>\""}], ";"}]], "Input"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TexPrint", "[", 
+  RowBox[{
+   RowBox[{"CD", "[", 
+    RowBox[{"-", "a"}], "]"}], "[", 
+   RowBox[{"T", "[", 
+    RowBox[{"b", ",", 
+     RowBox[{"-", "c"}]}], "]"}], "]"}], "]"}]], "Input"],
+
+Cell[BoxData["\<\"\\\\tau^{b}{}_{c}{}_{;a}\"\>"], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"DefTensor", "[", 
+  RowBox[{
+   RowBox[{"\[Lambda]", "[", "]"}], ",", "M4"}], "]"}]], "Input"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "DefTensor", 
+   "\[InvisibleSpace]", "\<\": Defining \"\>", 
+   "\[InvisibleSpace]", "\<\"tensor \"\>", "\[InvisibleSpace]", 
+   RowBox[{"\[Lambda]", "[", "]"}], "\[InvisibleSpace]", "\<\". \"\>", 
+   "\[InvisibleSpace]", "\<\"\"\>"}],
+  SequenceForm["** ", xAct`xTensor`DefTensor, ": Defining ", "tensor ", 
+   $CellContext`\[Lambda][], ". ", ""],
+  Editable->False]], "Print"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"1", "/", 
+   RowBox[{"Sqrt", "[", "2", "]"}]}], 
+  RowBox[{"T", "[", 
+   RowBox[{
+    RowBox[{"-", "a"}], ",", 
+    RowBox[{"-", "b"}], ",", 
+    RowBox[{"-", "c"}]}], "]"}]}]], "Input"],
+
+Cell[BoxData[
+ FractionBox[
+  InterpretationBox[
+   StyleBox[GridBox[{
+      {"\[Tau]", 
+       StyleBox[GridBox[{
+          {" ", " ", " "},
+          {"a", "b", "c"}
+         },
+         GridBoxSpacings->{"Columns" -> {
+             Offset[0.], {
+              Offset[0.034999999999999996`]}, 
+             Offset[0.]}, "ColumnsIndexed" -> {}, "Rows" -> {{
+              Offset[0.]}}, "RowsIndexed" -> {}}],
+        FontSize->9]}
+     },
+     GridBoxAlignment->{
+      "Columns" -> {{Center}}, "ColumnsIndexed" -> {}, "Rows" -> {{Center}}, 
+       "RowsIndexed" -> {}},
+     GridBoxSpacings->{"Columns" -> {
+         Offset[0.27999999999999997`], {
+          Offset[0.034999999999999996`]}, 
+         Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+         Offset[0.2], {
+          Offset[0.4]}, 
+         Offset[0.2]}, "RowsIndexed" -> {}}],
+    ShowAutoStyles->False,
+    AutoSpacing->False],
+   $CellContext`T[-$CellContext`a, -$CellContext`b, -$CellContext`c],
+   Editable->False], 
+  SqrtBox["2"]]], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TexPrint", "@", "%"}]], "Input"],
+
+Cell[BoxData["\<\"\\\\tfrac{1}{\\\\sqrt{2}}\\\\tau_{abc}\"\>"], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"1", "/", "3"}], 
+  RowBox[{"Sqrt", "[", "2", "]"}], 
+  RowBox[{"\[Lambda]", "[", "]"}]}]], "Input"],
+
+Cell[BoxData[
+ FractionBox[
+  RowBox[{
+   SqrtBox["2"], " ", 
+   InterpretationBox[
+    StyleBox["\[Lambda]",
+     ShowAutoStyles->False,
+     AutoSpacing->False],
+    $CellContext`\[Lambda][],
+    Editable->False]}], "3"]], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(", 
+   RowBox[{"2", "+", 
+    RowBox[{"\[Lambda]", "[", "]"}]}], ")"}], "/", 
+  RowBox[{"(", 
+   RowBox[{"1", "+", 
+    RowBox[{"\[Lambda]", "[", "]"}]}], ")"}]}]], "Input"],
+
+Cell[BoxData[
+ FractionBox[
+  RowBox[{"2", "+", 
+   InterpretationBox[
+    StyleBox["\[Lambda]",
+     ShowAutoStyles->False,
+     AutoSpacing->False],
+    $CellContext`\[Lambda][],
+    Editable->False]}], 
+  RowBox[{"1", "+", 
+   InterpretationBox[
+    StyleBox["\[Lambda]",
+     ShowAutoStyles->False,
+     AutoSpacing->False],
+    $CellContext`\[Lambda][],
+    Editable->False]}]]], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TexPrint", "@", "%"}]], "Input"],
+
+Cell[BoxData["\<\"\\\\frac{2 + \\\\lambda}{1 + \\\\lambda}\"\>"], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Block", "[", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"$TexFractionAsFraction", "=", "False"}], "}"}], ",", 
+   RowBox[{"TexPrint", "[", "%%", "]"}]}], "]"}]], "Input"],
+
+Cell[BoxData["\<\"(1 + \\\\lambda)^{-1} (2 + \\\\lambda)\"\>"], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"1", "/", "3"}], "/", 
+   RowBox[{"Sqrt", "[", "2", "]"}]}], "*", 
+  RowBox[{"\[Lambda]", "[", "]"}]}]], "Input"],
+
+Cell[BoxData[
+ FractionBox[
+  InterpretationBox[
+   StyleBox["\[Lambda]",
+    ShowAutoStyles->False,
+    AutoSpacing->False],
+   $CellContext`\[Lambda][],
+   Editable->False], 
+  RowBox[{"3", " ", 
+   SqrtBox["2"]}]]], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TexPrint", "@", "%"}]], "Input"],
+
+Cell[BoxData["\<\"\\\\tfrac{1}{3 \\\\sqrt{2}}\\\\lambda\"\>"], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"-", 
+    RowBox[{"Sqrt", "[", "2", "]"}]}], "/", 
+   RowBox[{"\[Lambda]", "[", "]"}]}], "/", "3"}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{"-", 
+  FractionBox[
+   SqrtBox["2"], 
+   RowBox[{"3", " ", 
+    InterpretationBox[
+     StyleBox["\[Lambda]",
+      ShowAutoStyles->False,
+      AutoSpacing->False],
+     $CellContext`\[Lambda][],
+     Editable->False]}]]}]], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TexPrint", "@", "%"}]], "Input"],
+
+Cell[BoxData["\<\"- \\\\frac{\\\\sqrt{2}}{3 \\\\lambda}\"\>"], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Block", "[", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"$TexFractionAsFraction", "=", "False"}], "}"}], ",", 
+   RowBox[{"TexPrint", "[", "%%", "]"}]}], "]"}]], "Input"],
+
+Cell[BoxData["\<\"- \\\\tfrac{1}{3} \\\\sqrt{2} \\\\lambda^{-1}\"\>"], \
+"Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"1", "/", 
+   RowBox[{"\[Lambda]", "[", "]"}]}], "/", "3"}]], "Input"],
+
+Cell[BoxData[
+ FractionBox["1", 
+  RowBox[{"3", " ", 
+   InterpretationBox[
+    StyleBox["\[Lambda]",
+     ShowAutoStyles->False,
+     AutoSpacing->False],
+    $CellContext`\[Lambda][],
+    Editable->False]}]]], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TexPrint", "@", "%"}]], "Input"],
+
+Cell[BoxData["\<\"\\\\frac{1}{3 \\\\lambda}\"\>"], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"1", "/", 
+    RowBox[{"\[Lambda]", "[", "]"}]}], "/", "3"}], "/", 
+  RowBox[{"Sqrt", "[", "2", "]"}]}]], "Input"],
+
+Cell[BoxData[
+ FractionBox["1", 
+  RowBox[{"3", " ", 
+   SqrtBox["2"], " ", 
+   InterpretationBox[
+    StyleBox["\[Lambda]",
+     ShowAutoStyles->False,
+     AutoSpacing->False],
+    $CellContext`\[Lambda][],
+    Editable->False]}]]], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TexPrint", "@", "%"}]], "Input"],
+
+Cell[BoxData["\<\"\\\\frac{1}{3 \\\\sqrt{2} \\\\lambda}\"\>"], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"1", "/", "3"}], "/", 
+  RowBox[{"Sqrt", "[", "2", "]"}]}]], "Input"],
+
+Cell[BoxData[
+ FractionBox["1", 
+  RowBox[{"3", " ", 
+   SqrtBox["2"]}]]], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TexPrint", "@", "%"}]], "Input"],
+
+Cell[BoxData["\<\"\\\\tfrac{1}{3 \\\\sqrt{2}}\"\>"], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(", 
+   RowBox[{
+    RowBox[{"\[Lambda]", "[", "]"}], "-", "3"}], ")"}], "/", 
+  RowBox[{"(", 
+   RowBox[{"1", "-", "\[Lambda]"}], ")"}]}]], "Input"],
+
+Cell[BoxData[
+ FractionBox[
+  RowBox[{
+   RowBox[{"-", "3"}], "+", 
+   InterpretationBox[
+    StyleBox["\[Lambda]",
+     ShowAutoStyles->False,
+     AutoSpacing->False],
+    $CellContext`\[Lambda][],
+    Editable->False]}], 
+  RowBox[{"1", "-", "\[Lambda]"}]]], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TexPrint", "@", "%"}]], "Input"],
+
+Cell[BoxData["\<\"- \\\\frac{3 -  \\\\lambda}{1 -  \\\\lambda}\"\>"], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Block", "[", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"$TexFractionAsFraction", "=", "False"}], "}"}], ",", 
+   RowBox[{"TexPrint", "[", "%%", "]"}]}], "]"}]], "Input"],
+
+Cell[BoxData["\<\"(1 -  \\\\lambda)^{-1} (-3 + \\\\lambda)\"\>"], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"1", "/", 
+   RowBox[{"Sqrt", "[", "2", "]"}]}], "*", 
+  RowBox[{
+   RowBox[{"T", "[", 
+    RowBox[{
+     RowBox[{"-", "a"}], ",", 
+     RowBox[{"-", "b"}], ",", 
+     RowBox[{"-", "c"}]}], "]"}], "/", 
+   RowBox[{"(", 
+    RowBox[{"1", "+", 
+     RowBox[{"\[Lambda]", "[", "]"}]}], ")"}]}]}]], "Input"],
+
+Cell[BoxData[
+ FractionBox[
+  InterpretationBox[
+   StyleBox[GridBox[{
+      {"\[Tau]", 
+       StyleBox[GridBox[{
+          {" ", " ", " "},
+          {"a", "b", "c"}
+         },
+         GridBoxSpacings->{"Columns" -> {
+             Offset[0.], {
+              Offset[0.034999999999999996`]}, 
+             Offset[0.]}, "ColumnsIndexed" -> {}, "Rows" -> {{
+              Offset[0.]}}, "RowsIndexed" -> {}}],
+        FontSize->9]}
+     },
+     GridBoxAlignment->{
+      "Columns" -> {{Center}}, "ColumnsIndexed" -> {}, "Rows" -> {{Center}}, 
+       "RowsIndexed" -> {}},
+     GridBoxSpacings->{"Columns" -> {
+         Offset[0.27999999999999997`], {
+          Offset[0.034999999999999996`]}, 
+         Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+         Offset[0.2], {
+          Offset[0.4]}, 
+         Offset[0.2]}, "RowsIndexed" -> {}}],
+    ShowAutoStyles->False,
+    AutoSpacing->False],
+   $CellContext`T[-$CellContext`a, -$CellContext`b, -$CellContext`c],
+   Editable->False], 
+  RowBox[{
+   SqrtBox["2"], " ", 
+   RowBox[{"(", 
+    RowBox[{"1", "+", 
+     InterpretationBox[
+      StyleBox["\[Lambda]",
+       ShowAutoStyles->False,
+       AutoSpacing->False],
+      $CellContext`\[Lambda][],
+      Editable->False]}], ")"}]}]]], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TexPrint", "@", "%"}]], "Input"],
+
+Cell[BoxData["\<\"\\\\frac{\\\\tau_{abc}}{\\\\sqrt{2} (1 + \
+\\\\lambda)}\"\>"], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Block", "[", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"$TexFractionAsFraction", "=", "False"}], "}"}], ",", 
+   RowBox[{"TexPrint", "[", "%%", "]"}]}], "]"}]], "Input"],
+
+Cell[BoxData["\<\"\\\\tfrac{1}{\\\\sqrt{2}}\\\\tau_{abc} (1 + \
+\\\\lambda)^{-1}\"\>"], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"UndefTensor", "/@", "$Tensors"}]], "Input"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "UndefTensor", 
+   "\[InvisibleSpace]", "\<\": Undefined \"\>", 
+   "\[InvisibleSpace]", "\<\"tensor\"\>", "\[InvisibleSpace]", "\<\" \"\>", 
+   "\[InvisibleSpace]", "T"}],
+  SequenceForm[
+  "** ", xAct`xTensor`UndefTensor, ": Undefined ", "tensor", 
+   " ", $CellContext`T],
+  Editable->False]], "Print"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "UndefTensor", 
+   "\[InvisibleSpace]", "\<\": Undefined \"\>", 
+   "\[InvisibleSpace]", "\<\"tensor\"\>", "\[InvisibleSpace]", "\<\" \"\>", 
+   "\[InvisibleSpace]", "\[Lambda]"}],
+  SequenceForm[
+  "** ", xAct`xTensor`UndefTensor, ": Undefined ", "tensor", 
+   " ", $CellContext`\[Lambda]],
+  Editable->False]], "Print"]
+}, Open  ]],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"Null", ",", "Null"}], "}"}]], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"<<", "xAct`SymManipulator`"}]], "Input"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData["\<\"------------------------------------------------------------\
+\"\>"], "Print"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"Package xAct`SymManipulator`  version \"\>", 
+   "\[InvisibleSpace]", "\<\"0.8.3\"\>", "\[InvisibleSpace]", "\<\", \"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{"2012", ",", "5", ",", "4"}], "}"}]}],
+  SequenceForm[
+  "Package xAct`SymManipulator`  version ", "0.8.3", ", ", {2012, 5, 4}],
+  Editable->False]], "Print"],
+
+Cell[BoxData["\<\"CopyRight (C) 2011, Thomas B\[ADoubleDot]ckdahl, under the \
+General Public License.\"\>"], "Print"],
+
+Cell[BoxData["\<\"------------------------------------------------------------\
+\"\>"], "Print"],
+
+Cell[BoxData["\<\"These packages come with ABSOLUTELY NO WARRANTY; for \
+details type Disclaimer[]. This is free software, and you are welcome to \
+redistribute it under certain conditions. See the General Public License for \
+details.\"\>"], "Print"],
+
+Cell[BoxData["\<\"------------------------------------------------------------\
+\"\>"], "Print"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"DefTensor", "[", 
+  RowBox[{
+   RowBox[{"T4", "[", 
+    RowBox[{
+     RowBox[{"-", "a"}], ",", 
+     RowBox[{"-", "b"}], ",", 
+     RowBox[{"-", "c"}], ",", 
+     RowBox[{"-", "d"}]}], "]"}], ",", "M4", ",", 
+   RowBox[{"PrintAs", "\[Rule]", "\"\<T\>\""}]}], "]"}]], "Input"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "DefTensor", 
+   "\[InvisibleSpace]", "\<\": Defining \"\>", 
+   "\[InvisibleSpace]", "\<\"tensor \"\>", "\[InvisibleSpace]", 
+   RowBox[{"T4", "[", 
+    RowBox[{
+     RowBox[{"-", "a"}], ",", 
+     RowBox[{"-", "b"}], ",", 
+     RowBox[{"-", "c"}], ",", 
+     RowBox[{"-", "d"}]}], "]"}], "\[InvisibleSpace]", "\<\". \"\>", 
+   "\[InvisibleSpace]", "\<\"\"\>"}],
+  SequenceForm["** ", xAct`xTensor`DefTensor, ": Defining ", "tensor ", 
+   $CellContext`T4[-$CellContext`a, -$CellContext`b, -$CellContext`c, \
+-$CellContext`d], ". ", ""],
+  Editable->False]], "Print"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"DefTensor", "[", 
+  RowBox[{
+   RowBox[{"S2", "[", 
+    RowBox[{
+     RowBox[{"-", "a"}], ",", 
+     RowBox[{"-", "b"}]}], "]"}], ",", "M4", ",", 
+   RowBox[{"PrintAs", "\[Rule]", "\"\<S\>\""}]}], "]"}]], "Input"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "DefTensor", 
+   "\[InvisibleSpace]", "\<\": Defining \"\>", 
+   "\[InvisibleSpace]", "\<\"tensor \"\>", "\[InvisibleSpace]", 
+   RowBox[{"S2", "[", 
+    RowBox[{
+     RowBox[{"-", "a"}], ",", 
+     RowBox[{"-", "b"}]}], "]"}], "\[InvisibleSpace]", "\<\". \"\>", 
+   "\[InvisibleSpace]", "\<\"\"\>"}],
+  SequenceForm["** ", xAct`xTensor`DefTensor, ": Defining ", "tensor ", 
+   $CellContext`S2[-$CellContext`a, -$CellContext`b], ". ", ""],
+  Editable->False]], "Print"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"ImposeSym", "[", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"S2", "[", 
+     RowBox[{"d", ",", 
+      RowBox[{"-", "f"}]}], "]"}], 
+    RowBox[{"T4", "[", 
+     RowBox[{
+      RowBox[{"-", "c"}], ",", 
+      RowBox[{"-", "a"}], ",", 
+      RowBox[{"-", "b"}], ",", "g"}], "]"}]}], ",", 
+   RowBox[{"IndexList", "[", 
+    RowBox[{
+     RowBox[{"-", "f"}], ",", 
+     RowBox[{"-", "a"}], ",", 
+     RowBox[{"-", "b"}], ",", "d", ",", "g"}], "]"}], ",", 
+   RowBox[{"JoinSGS", "[", 
+    RowBox[{
+     RowBox[{"Symmetric", "[", 
+      RowBox[{"{", 
+       RowBox[{"1", ",", "3"}], "}"}], "]"}], ",", 
+     RowBox[{"Antisymmetric", "[", 
+      RowBox[{"{", 
+       RowBox[{"4", ",", "5"}], "}"}], "]"}]}], "]"}]}], "]"}]], "Input"],
+
+Cell[BoxData[
+ InterpretationBox[
+  StyleBox[GridBox[{
+     {
+      RowBox[{
+       UnderscriptBox["Sym", 
+        StyleBox[
+         RowBox[{
+          RowBox[{"[", "16", "]"}], 
+          RowBox[{"(", "25", ")"}]}],
+         FontSize->Tiny]], "[", "S", "T", "]"}], 
+      StyleBox[GridBox[{
+         {"d", " ", " ", " ", " ", "g"},
+         {" ", "f", "c", "a", "b", " "}
+        },
+        GridBoxSpacings->{"Columns" -> {
+            Offset[0.], {
+             Offset[0.034999999999999996`]}, 
+            Offset[0.]}, "ColumnsIndexed" -> {}, "Rows" -> {{
+             Offset[0.]}}, "RowsIndexed" -> {}}],
+       FontSize->9]}
+    },
+    GridBoxAlignment->{
+     "Columns" -> {{Center}}, "ColumnsIndexed" -> {}, "Rows" -> {{Center}}, 
+      "RowsIndexed" -> {}},
+    GridBoxSpacings->{"Columns" -> {
+        Offset[0.27999999999999997`], {
+         Offset[0.034999999999999996`]}, 
+        Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+        Offset[0.2], {
+         Offset[0.4]}, 
+        Offset[0.2]}, "RowsIndexed" -> {}}],
+   ShowAutoStyles->False,
+   AutoSpacing->False],
+  xAct`SymManipulator`SymH[{$CellContext`S2, $CellContext`T4}, 
+   xAct`xPerm`StrongGenSet[{1, 2, 5, 6}, 
+    xAct`xPerm`GenSet[-xAct`xPerm`Cycles[{1, 6}], 
+     xAct`xPerm`Cycles[{2, 5}]]], 
+   "[16](25)"][$CellContext`d, -$CellContext`f, -$CellContext`c, \
+-$CellContext`a, -$CellContext`b, $CellContext`g],
+  Editable->False]], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TexPrint", "@", "%"}]], "Input"],
+
+Cell[BoxData["\<\"S^{[d}{}_{(f}T_{|ca|b)}{}^{g]}\"\>"], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"UndefTensor", "/@", "$Tensors"}]], "Input"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "UndefTensor", 
+   "\[InvisibleSpace]", "\<\": Undefined \"\>", 
+   "\[InvisibleSpace]", "\<\"tensor\"\>", "\[InvisibleSpace]", "\<\" \"\>", 
+   "\[InvisibleSpace]", "T4"}],
+  SequenceForm[
+  "** ", xAct`xTensor`UndefTensor, ": Undefined ", "tensor", 
+   " ", $CellContext`T4],
+  Editable->False]], "Print"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "UndefTensor", 
+   "\[InvisibleSpace]", "\<\": Undefined \"\>", 
+   "\[InvisibleSpace]", "\<\"tensor\"\>", "\[InvisibleSpace]", "\<\" \"\>", 
+   "\[InvisibleSpace]", "S2"}],
+  SequenceForm[
+  "** ", xAct`xTensor`UndefTensor, ": Undefined ", "tensor", 
+   " ", $CellContext`S2],
+  Editable->False]], "Print"]
+}, Open  ]],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"Null", ",", "Null"}], "}"}]], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"UndefManifold", "[", "M4", "]"}]], "Input"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "UndefVBundle", 
+   "\[InvisibleSpace]", "\<\": Undefined \"\>", 
+   "\[InvisibleSpace]", "\<\"vbundle\"\>", "\[InvisibleSpace]", "\<\" \"\>", 
+   "\[InvisibleSpace]", "TangentM4"}],
+  SequenceForm[
+  "** ", xAct`xTensor`UndefVBundle, ": Undefined ", "vbundle", 
+   " ", $CellContext`TangentM4],
+  Editable->False]], "Print"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "UndefManifold", 
+   "\[InvisibleSpace]", "\<\": Undefined \"\>", 
+   "\[InvisibleSpace]", "\<\"manifold\"\>", "\[InvisibleSpace]", "\<\" \"\>", 
+   "\[InvisibleSpace]", "M4"}],
+  SequenceForm[
+  "** ", xAct`xTensor`UndefManifold, ": Undefined ", "manifold", 
+   " ", $CellContext`M4],
+  Editable->False]], "Print"]
+}, Open  ]]
+}, Open  ]]
+}, Closed]]
+}, Open  ]]
+},
+AutoGeneratedPackage->Automatic,
+WindowSize->{995, 604},
+WindowMargins->{{Automatic, -31}, {Automatic, 0}},
+PrivateNotebookOptions->{"FileOutlineCache"->False},
+ShowSelection->True,
+FrontEndVersion->"9.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (January 25, \
+2013)",
+StyleDefinitions->"Default.nb",
+$CellContext`TrackCellChangeTimes -> False
+]
+

@@ -519,7 +519,13 @@ otherwize they are printed as a product with negative exponents.\>\""}],
  RowBox[{
   RowBox[{
    RowBox[{"$TexFixExtraRules", "::", "usage"}], "=", "\"\<\>\""}], 
-  ";"}]}], "Input",
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"TexMatrix", "::", "usage"}], " ", "=", 
+   "\"\<TexMatrix[M] produces TeX code for the matrix M, where all elements \
+are typset by the function Tex. TexMatrix[M, F] uses the function F instead \
+of Tex on the elements.\>\""}], ";"}]}], "Input",
  InitializationCell->True]
 }, Closed]],
 
@@ -1474,6 +1480,12 @@ Cell[BoxData[
    "\[IndentingNewLine]", 
    RowBox[{
     RowBox[{
+     RowBox[{"TexFactor", "[", 
+      RowBox[{"-", "1"}], "]"}], ":=", 
+     RowBox[{"TexOperator", "[", "Minus", "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
      RowBox[{"TexFactor", "[", "expr_Plus", "]"}], ":=", 
      RowBox[{"StringJoin", "[", 
       RowBox[{
@@ -2214,6 +2226,45 @@ Cell[BoxData[
       RowBox[{
        RowBox[{"ScreenDollarIndices", "[", "expr", "]"}], ",", "initlevel"}], 
       "]"}]}]}], ";"}]}]], "Input",
+ InitializationCell->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["3.18. Matrices", "Subsection"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"TexMatrix", "[", 
+   RowBox[{
+    RowBox[{"M_", "?", "MatrixQ"}], ",", 
+    RowBox[{"F_:", " ", "Tex"}]}], "]"}], ":=", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"rows", "=", 
+       RowBox[{"Length", "[", "M", "]"}]}], ",", 
+      RowBox[{"cols", "=", 
+       RowBox[{"Length", "@", 
+        RowBox[{"First", "@", "M"}]}]}]}], "}"}], ",", 
+    RowBox[{"StringJoin", "[", 
+     RowBox[{"\"\<\\\\left(\\\\begin{array}{\>\"", ",", 
+      RowBox[{"StringJoin", "@@", 
+       RowBox[{"ConstantArray", "[", 
+        RowBox[{"\"\<c\>\"", ",", 
+         RowBox[{"{", "cols", "}"}]}], "]"}]}], ",", "\"\<}\\n\>\"", ",", 
+      RowBox[{"StringJoin", "[", 
+       RowBox[{"Riffle", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{
+           RowBox[{"StringJoin", "[", 
+            RowBox[{"Riffle", "[", 
+             RowBox[{
+              RowBox[{"F", "/@", "#"}], ",", "\"\< & \>\""}], "]"}], "]"}], 
+           "&"}], "/@", "M"}], ",", "\"\<\\\\\\\\\\n\>\""}], "]"}], "]"}], 
+      ",", "\"\<\\n\\\\end{array}\\\\right)\>\""}], "]"}]}], "]"}]}]], "Input",
  InitializationCell->True]
 }, Closed]]
 }, Open  ]],

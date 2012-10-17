@@ -90,6 +90,7 @@ $TexSmallFraction::usage="$TexSmallFraction is a global variable specifying the 
 $TexFractionAsFraction::usage="Option for TexPrint. If True, fractions are printed as fractions, otherwize they are printed as a product with negative exponents.";
 $TexParenthesisInitLevel::usage="";
 $TexFixExtraRules::usage="";
+TexMatrix::usage ="TexMatrix[M] produces TeX code for the matrix M, where all elements are typset by the function Tex. TexMatrix[M, F] uses the function F instead of Tex on the elements.";
 
 
 Begin["`Private`"]
@@ -224,6 +225,7 @@ Tex[-expr_]:=TexOperator[Minus]<>Tex[expr];
 (* Product *)
 TexOperator[Times]:=" ";
 TexFactor[1]:="";
+TexFactor[-1]:=TexOperator[Minus];
 TexFactor[expr_Plus]:=StringJoin[TexOpen["("],Tex[expr],TexClose[")"]];
 TexFactor[expr_]:=Tex[expr];
 TexOrdinaryTimes[expr_Times]:=StringJoin@@Riffle[TexFactor/@List@@expr,TexOperator[Times]];
@@ -344,6 +346,9 @@ TexFix[string_String]:=StringReplace[string,Join[{"+-"->"-","+ -"->"- "," _"->"_
 
 (* Main. Public *)
 TexPrint[expr_,initlevel_:Automatic]:=TexFix@TexParenthesis[ScreenDollarIndices[expr],initlevel];
+
+
+TexMatrix[M_?MatrixQ,F_: Tex]:=Module[{rows=Length[M],cols=Length@First@M},StringJoin["\\left(\\begin{array}{",StringJoin@@ConstantArray["c",{cols}],"}\n",StringJoin[Riffle[StringJoin[Riffle[F/@#," & "]]&/@M,"\\\\\n"]],"\n\\end{array}\\right)"]]
 
 
 Tex[xAct`SymManipulator`SymH[headlist_,sym_,label_]?xTensorQ[inds___]]:=TexSymH[xAct`SymManipulator`SymH[headlist,sym,label][inds]]

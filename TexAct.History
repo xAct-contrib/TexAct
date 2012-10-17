@@ -6,3 +6,5 @@
  4 May	- TexPrint functionality for SymH objects was removed from SymManipulator, and a new improved code was written in TexAct.
 
  5 May	* Released in xAct 1.0.4.
+
+17 October	- Added TexMatrix. Fixed TexFactor[-1]

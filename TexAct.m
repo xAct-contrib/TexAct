@@ -344,7 +344,7 @@ $TexFixExtraRules={};
 
 
 (* Note that we remove the dollars! This is because \[Mu]3 is converted into $\mu$3 for instance *)
-TexFix[string_String]:=StringReplace[string,Join[{"+-"->"-","+ -"->"- "," _"->"_"," ^"->"^","  "->" ","$"->""},$TexFixExtraRules]];
+TexFix[string_String]:=StringReplace[StringReplace[string,"$"->""],Join[{"+-"->"-","+ -"->"- "," _"->"_"," ^"->"^","  "->" ","   "->" ", " }"->"}"},$TexFixExtraRules]];
 
 
 (* Main. Public *)

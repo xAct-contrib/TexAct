@@ -2218,7 +2218,10 @@ Cell[BoxData[
    RowBox[{
     RowBox[{"TexFix", "[", "string_String", "]"}], ":=", 
     RowBox[{"StringReplace", "[", 
-     RowBox[{"string", ",", 
+     RowBox[{
+      RowBox[{"StringReplace", "[", 
+       RowBox[{"string", ",", 
+        RowBox[{"\"\<$\>\"", "->", "\"\<\>\""}]}], "]"}], ",", 
       RowBox[{"Join", "[", 
        RowBox[{
         RowBox[{"{", 
@@ -2228,7 +2231,8 @@ Cell[BoxData[
           RowBox[{"\"\< _\>\"", "->", "\"\<_\>\""}], ",", 
           RowBox[{"\"\< ^\>\"", "->", "\"\<^\>\""}], ",", 
           RowBox[{"\"\<  \>\"", "->", "\"\< \>\""}], ",", 
-          RowBox[{"\"\<$\>\"", "->", "\"\<\>\""}]}], "}"}], ",", 
+          RowBox[{"\"\<   \>\"", "->", "\"\< \>\""}], ",", " ", 
+          RowBox[{"\"\< }\>\"", "\[Rule]", "\"\<}\>\""}]}], "}"}], ",", 
         "$TexFixExtraRules"}], "]"}]}], "]"}]}], ";"}]}]], "Input",
  InitializationCell->True],
 

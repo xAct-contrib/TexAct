@@ -193,8 +193,11 @@ Tex[Tan]:="\\tan";
 Tex[symbol_Symbol]:=Tex@PrintAs[symbol];
 
 
+ExtraSpaceIfBackslash[str_String]:=If[StringFreeQ[str,"\\"],str,StringJoin[str," "]];
+
+
 (* One index *)
-TexUpIndex[index_]:=Tex[IndexForm[index]];
+TexUpIndex[index_]:=ExtraSpaceIfBackslash@Tex[IndexForm[index]];
 
 
 $TexPrintInitialBracesQ=False;

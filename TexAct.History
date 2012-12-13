@@ -8,3 +8,5 @@
  5 May	* Released in xAct 1.0.4.
 
 17 October	- Added TexMatrix. Fixed TexFactor[-1]
+
+13 December - Added spaces after indices with backslash to avoid problems like "\alphab".

@@ -1202,6 +1202,25 @@ Cell[CellGroupData[{
 Cell["3.6. Indices", "Subsection"],
 
 Cell["\<\
+Add an extra space at the end of the string if we find a backslash. This is \
+to avoid things like \[OpenCurlyDoubleQuote]\\alphab\[CloseCurlyDoubleQuote] \
+instead of \[OpenCurlyDoubleQuote]\\alpha b\[CloseCurlyDoubleQuote] in the \
+list of indices.\
+\>", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"ExtraSpaceIfBackslash", "[", "str_String", "]"}], ":=", 
+   RowBox[{"If", "[", 
+    RowBox[{
+     RowBox[{"StringFreeQ", "[", 
+      RowBox[{"str", ",", "\"\<\\\\\>\""}], "]"}], ",", "str", ",", 
+     RowBox[{"StringJoin", "[", 
+      RowBox[{"str", ",", "\"\< \>\""}], "]"}]}], "]"}]}], ";"}]], "Input",
+ InitializationCell->True],
+
+Cell["\<\
 Those indices which are not recognized by neither UpIndexQ or DownIndexQ (for \
 example patterns) are passed to ToString:\
 \>", "Text"],
@@ -1213,8 +1232,9 @@ Cell[BoxData[
   RowBox[{
    RowBox[{
     RowBox[{"TexUpIndex", "[", "index_", "]"}], ":=", 
-    RowBox[{"Tex", "[", 
-     RowBox[{"IndexForm", "[", "index", "]"}], "]"}]}], ";"}]}]], "Input",
+    RowBox[{"ExtraSpaceIfBackslash", "@", 
+     RowBox[{"Tex", "[", 
+      RowBox[{"IndexForm", "[", "index", "]"}], "]"}]}]}], ";"}]}]], "Input",
  InitializationCell->True],
 
 Cell["\<\

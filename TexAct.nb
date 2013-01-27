@@ -56,7 +56,7 @@ Cell[BoxData[
 
 Cell[BoxData[
  RowBox[{"{", 
-  RowBox[{"2012", ",", "5", ",", "4", ",", "10", ",", "59", ",", "1"}], 
+  RowBox[{"2012", ",", "12", ",", "13", ",", "11", ",", "45", ",", "59"}], 
   "}"}]], "Output"]
 }, Open  ]],
 
@@ -64,9 +64,9 @@ Cell[BoxData[{
  RowBox[{
   RowBox[{"xAct`TexAct`$Version", "=", 
    RowBox[{"{", 
-    RowBox[{"\"\<0.3.0\>\"", ",", 
+    RowBox[{"\"\<0.3.1\>\"", ",", 
      RowBox[{"{", 
-      RowBox[{"2012", ",", "5", ",", "5"}], "}"}]}], "}"}]}], ";"}], "\n", 
+      RowBox[{"2012", ",", "12", ",", "13"}], "}"}]}], "}"}]}], ";"}], "\n", 
  RowBox[{
   RowBox[{"xAct`TexAct`$xTensorVersionExpected", "=", 
    RowBox[{"{", 
@@ -346,12 +346,12 @@ Cell[BoxData["\<\"------------------------------------------------------------\
 Cell[BoxData[
  InterpretationBox[
   RowBox[{"\<\"Package xAct`TexAct`  version \"\>", 
-   "\[InvisibleSpace]", "\<\"0.3.0\"\>", "\[InvisibleSpace]", "\<\", \"\>", 
+   "\[InvisibleSpace]", "\<\"0.3.1\"\>", "\[InvisibleSpace]", "\<\", \"\>", 
    "\[InvisibleSpace]", 
    RowBox[{"{", 
-    RowBox[{"2012", ",", "5", ",", "5"}], "}"}]}],
-  SequenceForm["Package xAct`TexAct`  version ", "0.3.0", ", ", {2012, 5, 5}],
-  
+    RowBox[{"2012", ",", "12", ",", "13"}], "}"}]}],
+  SequenceForm[
+  "Package xAct`TexAct`  version ", "0.3.1", ", ", {2012, 12, 13}],
   Editable->False]], "Print"],
 
 Cell[BoxData["\<\"CopyRight (C) 2008-2012, Thomas B\[ADoubleDot]ckdahl, Jose \
@@ -3179,10 +3179,9 @@ Cell[BoxData[{
        
        RowBox[{"StringInsert", "[", 
         RowBox[{"string", ",", "breakstring", ",", "positions"}], "]"}]}]}], 
-     "\[IndentingNewLine]", "]"}]}], ";"}], "\n", 
+     "\[IndentingNewLine]", "]"}]}], ";"}], "\[IndentingNewLine]", 
   RowBox[{"(*", " ", 
-   RowBox[{"Shortcuts", " ", "and", " ", "defaults"}], " ", 
-   "*)"}]}], "\[IndentingNewLine]", 
+   RowBox[{"Shortcuts", " ", "and", " ", "defaults"}], " ", "*)"}]}], "\n", 
  RowBox[{
   RowBox[{
    RowBox[{"TexBreak", "[", 
@@ -3915,12 +3914,12 @@ Cell[BoxData["\<\"------------------------------------------------------------\
 Cell[BoxData[
  InterpretationBox[
   RowBox[{"\<\"Package xAct`SymManipulator`  version \"\>", 
-   "\[InvisibleSpace]", "\<\"0.8.3\"\>", "\[InvisibleSpace]", "\<\", \"\>", 
+   "\[InvisibleSpace]", "\<\"0.8.4\"\>", "\[InvisibleSpace]", "\<\", \"\>", 
    "\[InvisibleSpace]", 
    RowBox[{"{", 
-    RowBox[{"2012", ",", "5", ",", "4"}], "}"}]}],
+    RowBox[{"2012", ",", "12", ",", "10"}], "}"}]}],
   SequenceForm[
-  "Package xAct`SymManipulator`  version ", "0.8.3", ", ", {2012, 5, 4}],
+  "Package xAct`SymManipulator`  version ", "0.8.4", ", ", {2012, 12, 10}],
   Editable->False]], "Print"],
 
 Cell[BoxData["\<\"CopyRight (C) 2011, Thomas B\[ADoubleDot]ckdahl, under the \

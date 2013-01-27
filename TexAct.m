@@ -1,4 +1,4 @@
-xAct`TexAct`$Version={"0.3.0",{2012,5,5}};
+xAct`TexAct`$Version={"0.3.1",{2012,12,13}};
 xAct`TexAct`$xTensorVersionExpected={"1.0.4",{2012,5,5}};
 
 
@@ -513,3 +513,6 @@ End[]
 
 
 EndPackage[]
+
+
+

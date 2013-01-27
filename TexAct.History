@@ -10,3 +10,9 @@
 17 October	- Added TexMatrix. Fixed TexFactor[-1]
 
 13 December - Added spaces after indices with backslash to avoid problems like "\alphab".
+
+--------------------------------------------------------------------------------
+2013
+
+27 Jan  * Released with version 0.3.1
+

@@ -16,3 +16,13 @@
 
 27 Jan  * Released with version 0.3.1
 
+1  Feb  Added TexIndexForm and fixed bug with coloured indices.
+
+19 June Added $TexSmallFractionExponent
+
+8 July Added the option TexBreakBy -> "TexPoint" to TexBreak
+
+9 July Added TexPrintAlignedEquations
+
+18 July - Fixed TexBreak so it only breaks at bracket level 0. -TeXForm crashes when given a StyleBox, so now we remove style boxes before passing anything to TexForm. This also gives a better fix for the problem with the coloured indices.
+-FormatTexBasis introduced.

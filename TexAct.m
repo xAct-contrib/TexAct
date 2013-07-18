@@ -1,10 +1,10 @@
-xAct`TexAct`$Version={"0.3.1",{2012,12,13}};
-xAct`TexAct`$xTensorVersionExpected={"1.0.4",{2012,5,5}};
+xAct`TexAct`$Version={"0.3.2",{2013,7,18}};
+xAct`TexAct`$xTensorVersionExpected={"1.0.5",{2013,1,30}};
 
 
 (* TexAct, Tex code to format xAct expressions *)
 
-(* Copyright (C) 2008-2012 Thomas B\[ADoubleDot]ckdahl, Jose M. Martin-Garcia and Barry Wardell *)
+(* Copyright (C) 2008-2013 Thomas B\[ADoubleDot]ckdahl, Jose M. Martin-Garcia and Barry Wardell *)
 
 (* This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published
@@ -27,16 +27,16 @@ You should have received a copy of the GNU General Public License
 
 (* :Author: Thomas B\[ADoubleDot]ckdahl, Jose M. Martin-Garcia and Barry Wardell *)
 
-(* :Summary: Tex code to formar xAct expressions *)
+(* :Summary: Tex code to format xAct expressions *)
 
 (* :Brief Discussion:
 *)
   
 (* :Context: xAct`Texsor` *)
 
-(* :Package Version: 0.3.0 *)
+(* :Package Version: 0.3.2 *)
 
-(* :Copyright: Thomas B\[ADoubleDot]ckdahl, Jose M. Martin-Garcia and Barry Wardell (2008-2012) *)
+(* :Copyright: Thomas B\[ADoubleDot]ckdahl, Jose M. Martin-Garcia and Barry Wardell (2008-2013) *)
 
 (* :History: see TexAct.History file *)
 
@@ -57,12 +57,12 @@ If[Unevaluated[xAct`xCore`Private`$LastPackage]===xAct`xCore`Private`$LastPackag
 BeginPackage["xAct`TexAct`",{"xAct`xCore`","xAct`xPerm`","xAct`xTensor`"}]
 
 
-If[Not@OrderedQ@Map[Last,{$xTensorVersionExpected,xAct`xTensor`$Version}],Throw@Message[General::versions,"xTensor",xAct`xTensor`$Version,$xTensorVersionExpected]]
+If[Not@OrderedQ@Map[Last,{xAct`TexAct`$xTensorVersionExpected,xAct`xTensor`$Version}],Throw@Message[General::versions,"xTensor",xAct`xTensor`$Version,xAct`TexAct`$xTensorVersionExpected]]
 
 
 Print[xAct`xCore`Private`bars];
-Print["Package xAct`TexAct`  version ",$Version[[1]],", ",$Version[[2]]];
-Print["CopyRight (C) 2008-2012, Thomas B\[ADoubleDot]ckdahl, Jose M. Martin-Garcia and Barry Wardell, under the General Public License."]
+Print["Package xAct`TexAct`  version ",xAct`TexAct`$Version[[1]],", ",xAct`TexAct`$Version[[2]]];
+Print["CopyRight (C) 2008-2013, Thomas B\[ADoubleDot]ckdahl, Jose M. Martin-Garcia and Barry Wardell, under the General Public License."]
 
 
 Off[General::shdw]
@@ -87,10 +87,17 @@ $TexPrintInitialBracesQ::usage="$TexPrintInitialBracesQ is a Boolean global vari
 $TexScalarParentheses::usage="$TexScalarParentheses is a Boolean global variable, with default True. If set to True the Scalar expressions are formatted with wrapping parentheses.";
 $TexFraction::usage="$TexFraction is a global variable specifying the Tex command to be used to format fractions, with default \"\\frac\".";
 $TexSmallFraction::usage="$TexSmallFraction is a global variable specifying the Tex command to be use to format rational numbers, with default \"\\tfrac\".";
+$TexSmallFractionExponent::usage="$TexSmallFractionExponent is a global variable specifying the Tex command to be use to format rational numbers, with default False.";
 $TexFractionAsFraction::usage="Option for TexPrint. If True, fractions are printed as fractions, otherwize they are printed as a product with negative exponents.";
 $TexParenthesisInitLevel::usage="";
 $TexFixExtraRules::usage="";
 TexMatrix::usage ="TexMatrix[M] produces TeX code for the matrix M, where all elements are typset by the function Tex. TexMatrix[M, F] uses the function F instead of Tex on the elements.";
+TexIndexForm::usage ="Special formatting for indices.";
+$TexDirectory::usage ="Directory for placement of the TexActWidthTest.tex file for determining of widths for linebreaking. If no directory is given, the current directory will be used.";
+$TexInitLatexCode::usage ="The initial lines of the TexActWidthTest.tex file for determining of widths for linebreaking. Observe that \\begin{document} sould not be included.";
+TexPrintAlignedEquations::usage ="TexPrintAlignedEquations takes a list of equations and typesets them in an align environment with line breaking so the total length does not exceed $TexPrintPageWidth.";
+$TexPrintPageWidth::usage = "Parameter to adjust the line breaking for TexPrintAlignedEquations";
+FormatTexBasis::usage ="FormatTexBasis works the same way as FormatBasis, but for the Tex output.";
 
 
 Begin["`Private`"]
@@ -144,9 +151,10 @@ Tex[]:="";
 
 $TexFraction="\\frac";
 $TexSmallFraction="\\tfrac";
+$TexSmallFractionExponent=False;
 
 
-TexFrac1[numer_, denom_,fracsymbol_]:=StringJoin[fracsymbol,"{",Tex[numer],"}{",Tex[denom],"}"];
+TexFrac1[numer_, denom_,fracsymbol_]:=If[fracsymbol===False,StringJoin[Tex[numer],"/",Tex[denom]],StringJoin[fracsymbol,"{",Tex[numer],"}{",Tex[denom],"}"]];
 
 
 TexFracExpression[numer_, denom_,fracsymbol_]:=If[WithMinusQ[numer],
@@ -177,7 +185,12 @@ Tex[Pi]="\\pi";
 (* Strings *)
 Removetext[string_String]:=StringDrop[StringDrop[string,6],-1]/;StringMatchQ[string,"\\text{*}"];
 Removetext[string_String]:=string;
-Tex[string_String]:=Removetext@ToString@TeXForm@string;
+(* TeXForm does not work on StyleBoxes so we remove them first. *)
+RemoveStyleBoxes[string_String]:=StringReplace[string,StringExpression["\!\(\*StyleBox[\"",x___,"\"",y___,"]\)"]:>x]
+Tex[string_String]:=Removetext@ToString@TeXForm@RemoveStyleBoxes@string;
+
+
+Tex["\[Eth]"]="\\eth"
 
 
 (* Functions *)
@@ -196,8 +209,11 @@ Tex[symbol_Symbol]:=Tex@PrintAs[symbol];
 ExtraSpaceIfBackslash[str_String]:=If[StringFreeQ[str,"\\"],str,StringJoin[str," "]];
 
 
+TexIndexForm[index_]:=Tex[IndexForm[index]]
+
+
 (* One index *)
-TexUpIndex[index_]:=ExtraSpaceIfBackslash@Tex[IndexForm[index]];
+TexUpIndex[index_]:=ExtraSpaceIfBackslash@TexIndexForm@index;
 
 
 $TexPrintInitialBracesQ=False;
@@ -276,11 +292,31 @@ TexFracExpression[numer,denom1 Sqrt[num],$TexFraction]]
 (* Power *)
 TexOperator[Power]:="^";
 TexBase[x:(_Symbol|_Integer|_?xTensorQ[___])]:=Tex[x];
+TexBase[x:Scalar[expr_]]:=Tex[x]/;$TexScalarParentheses;
 TexBase[x_]:=StringJoin[TexOpen["("],Tex[x],TexClose[")"]];
-TexExponent[x_]:=With[{tex=Tex[x]},If[StringLength[tex]===1,tex,StringJoin["{",tex,"}"]]];
+TexExponent[x_]:=Block[{$TexSmallFraction=$TexSmallFractionExponent},With[{tex=Tex[x]},If[StringLength[tex]===1,tex,StringJoin["{",tex,"}"]]]];
 (*Tex[Power[x_,-1]]:=StringJoin["\\frac{1}{",Tex[x],"}"]/;ByteCount[x]<200;*)
 Tex[Power[x_,-1]]:=TexFracExpression[1,x,$TexFraction]/;$TexFractionAsFraction;
 Tex[Power[x_,n_]]:=StringJoin[TexBase[x],TexOperator[Power],TexExponent[n]];
+
+
+(* Basis *)
+
+
+Tex[Basis[a_,b_]]:=TexBasis[a,b]
+
+
+TexBasis[inds__]:=StringJoin[Tex[Basis],TexIndices[inds]];
+
+
+FormatTexBasis[{i_Integer,basis_?BasisQ},texstring_String]:=SetDelayed[TexBasis[ind_,{i,basis}],StringJoin[texstring,TexIndices[ind]]];
+FormatTexBasis[{i_Integer,basis_?BasisQ}]:=Unset[TexBasis[ind_,{i,basis}]];
+FormatTexBasis[{i_Integer,-basis_?BasisQ},texstring_String]:=
+SetDelayed[TexBasis[{i,-basis},ind_],StringJoin[texstring,TexIndices[ind]]];
+
+
+FormatTexBasis[covd_Symbol?CovDQ[{i_Integer,basis_}],texstring_String]:=SetDelayed[TexCovDPrefix[covd,IndexList[{i,basis}]],texstring];
+FormatTexBasis[covd_Symbol?CovDQ[{i_Integer,basis_}]]:=Unset[TexCovDPrefix[covd,IndexList[{i,basis}]]]
 
 
 (* Tensors *)
@@ -311,11 +347,12 @@ Tex[expr]
 
 
 (* Covariant derivatives *)
-Tex[covd_Symbol?CovDQ[inds__][expr_]]:=TexCovDCombine[TexCovD[covd],Tex[expr],IndexList[inds],$CovDFormat];
-Tex[CovD[expr_,ders___,der_Symbol?CovDQ[inds__]]]:=TexCovDCombine[TexCovD[covd],Tex[expr],IndexList[inds],$CovDFormat];
-TexCovDCombine[{post_,pre_},exprstring_String,list_IndexList,"Prefix"]:=StringJoin[Tex@pre,TexIndices@@list,exprstring];
-TexCovDCombine[{post_,pre_},exprstring_String,list_IndexList,"Postfix"]:=StringJoin[exprstring,TexCovDIndices[Tex@post]@@list];
-TexCovD[covd_]:=SymbolOfCovD[covd];
+Tex[covd_Symbol?CovDQ[inds__][expr_]]:=TexCovDCombine[covd,Tex[expr],IndexList[inds],$CovDFormat];
+TexCovDCombine[covd_,exprstring_String,list_IndexList,"Prefix"]:=StringJoin[TexCovDPrefix[covd,list],exprstring];
+TexCovDPrefix[covd_,list_IndexList]:=StringJoin[Last@TexCovD[covd],TexIndices@@list];
+TexCovDCombine[covd_,exprstring_String,list_IndexList,"Postfix"]:=StringJoin[exprstring,TexCovDIndices[First@TexCovD@covd]@@list];
+(* If the $CovDFormat only gives one string, use it for both cases. *)
+TexCovD[covd_]:=Tex/@SymbolOfCovD[covd];
 
 
 (* Lie derivatives *)
@@ -331,9 +368,6 @@ StringJoin[Tex[expr],"{}_{,",Sequence@@(Tex/@{ps}),"}"],Apply[StringJoin,TexPara
 (*
 Tex[ParamD[ps__][expr_]]:=Apply[StringJoin,TexParamD/@Split@Sort[ps]]<>TexOpen["["]<>Tex[expr]<>TexClose["]"];
 *)
-
-
-(* Basis *)
 
 
 (* Equal *)
@@ -450,11 +484,23 @@ StringJoin[indexstring,preindexsymbol,TexUpIndex[UpIndex @index]]]
 Options[TexBreak]={TexBreakBy->"Character",TexBreakAt->" + "|" - ",TexBreakString->" \\nonumber \\\\ \n&&"};
 
 
-TexBreak[string_String,n_Integer,l_List,options___]:=Module[{splittablePositions,breakat,breakby,breakstring,splitat,positions,perLine},
+BreakingFunction[rulelist_,n_]:=Module[{best=Select[rulelist,#[[1]]<=n&]},If[Length@best==0,Last@First[rulelist],Last@Last@best]]
+
+
+TexBreak[string_String,n_Integer,l_List,options___]:=Module[{splittablePositions,breakat,breakby,breakstring,splitat,positions,perLine,splitted,texedwidth,splitstructure},
 {breakat,breakby,breakstring}={TexBreakAt,TexBreakBy,TexBreakString}/.CheckOptions[options]/.Options[TexBreak];
 
 (* Positions where the string can be split: wherever + or - is encountered *)
-splittablePositions=First/@StringPosition[string,breakat];
+(* Older code: splittablePositions=First/@StringPosition[string,breakat]; *)
+
+(* Count the bracket level and split only when breakat appears at bracket level 0. *)
+(* At which position do we find breakat or brackets? *)
+splittablePositions=First/@StringPosition[string,Append[Append[breakat,"{"],"}"]];
+(* Construct a structure of the kind {pos, n, notbracketQ}, where pos is the position of the character, n is 1 for opening brackets, -1 for closing brackets and 0 for everything else. *)
+splitstructure=Switch[StringTake[string,{#}],"{",{#,1,False},"}",{#,-1,False},_,{#,0,True}]&/@splittablePositions;
+(* Compute the bracket level by accumulating the n's. Return a structure {pos, possiblebreakQ}, and extract the possible breaking positions. *)
+splitstructure=MapThread[{#1[[1]],And[#2==0,#1[[3]]]}&,{splitstructure,Accumulate[#[[2]]&/@splitstructure]}];
+splittablePositions=First/@Select[splitstructure,#[[2]]&];
 
 (* The terms/characters per line that the user specified *)
 If[l!={},perLine=SparseArray[l,Automatic,n],perLine={n}];
@@ -496,6 +542,34 @@ splitat=Accumulate[perLine];
 (* The positions in the string to split at *)
 positions=Map[Part[splittablePositions,#]&,splitat];,
 
+"TexPoint",
+positions={};
+splitted=StringTake[string,Thread[{Prepend[splittablePositions,1],Append[splittablePositions-1,StringLength@string]}]];
+texedwidth=TexWidths@@splitted;
+Module[{nearestTerm},
+(* Split parts where lengths are given explicitly *)
+While[And[Length@perLine>0,Length@splittablePositions>0],
+nearestTerm=BreakingFunction[Thread@Rule[Accumulate@texedwidth, Range@Length@texedwidth],perLine[[1]]];
+perLine=Rest@Normal@perLine;
+If[nearestTerm<=Length@splittablePositions,
+AppendTo[positions,splittablePositions[[nearestTerm]]];
+splittablePositions=Drop[splittablePositions,nearestTerm];
+texedwidth=Drop[texedwidth,nearestTerm],
+splittablePositions={};
+texedwidth={};];
+];
+(* Split remainder into strings of length~n) *)
+While[Length@splittablePositions>0,
+nearestTerm=BreakingFunction[Thread@Rule[Accumulate@texedwidth, Range@Length@texedwidth],n];
+If[nearestTerm<=Length@splittablePositions,
+AppendTo[positions,splittablePositions[[nearestTerm]]];
+splittablePositions=Drop[splittablePositions,nearestTerm];
+texedwidth=Drop[texedwidth,nearestTerm],
+splittablePositions={};
+texedwidth={};];
+];
+],
+
 _,
 Throw["Invalid value for option TexBreakBy."]
 
@@ -507,6 +581,68 @@ StringInsert[string,breakstring,positions]
 (* Shortcuts and defaults *)
 TexBreak[string_String,n_Integer,options___]:=TexBreak[string,n,{},options];
 TexBreak[string_String,options___]:=TexBreak[string,200,{},options];
+
+
+$TexDirectory=$TemporaryDirectory;
+
+
+$TexInitLatexCode="\\documentclass[10pt,a4paper]{article}
+\\usepackage{amssymb}
+\\usepackage{amsmath}
+\\usepackage{amsthm}
+\\usepackage{latexsym}\n";
+
+
+TexActWriteFile[strs___]:=
+Module[{tmpfile=OpenWrite["TexActWidthTest.tex"]},
+WriteString[tmpfile,$TexInitLatexCode];
+WriteString[tmpfile,"\\newlength{\\widthofexpr}
+\\newcommand{\\testwidth}[1]{\\settowidth{\\widthofexpr}{\\hbox{${}#1$}}}
+\\newcommand{\\writewidth}[1]{\\settowidth{\\widthofexpr}{\\hbox{${}#1$}}
+\\immediate\\write0{\\the\\widthofexpr}}
+\\begin{document}\n"];
+WriteString[tmpfile,StringJoin["\\testwidth{",#,"}\n"]]&/@{strs};WriteString[tmpfile,"\\immediate\\write0{xActWidthStart}\n"];
+WriteString[tmpfile,StringJoin["\\writewidth{",#,"}\n"]]&/@{strs};
+WriteString[tmpfile,"\\immediate\\write0{xActWidthEnd}
+\\end{document}"];
+Close[tmpfile];];
+
+
+ExtractTexWidths[str1_List]:=With[{str2=Drop[str1,First@First@Position[str1,"xActWidthStart",1,1]]},ToExpression/@(StringReplace[#,"pt"->""]&/@Take[str2,First@First@Position[str2,"xActWidthEnd",1,1]-1])]
+
+
+TexWidths[strs___]:=
+Module[{TexOut,errorpos},
+SetDirectory[$TexDirectory];
+TexActWriteFile[strs];
+TexOut=ReadList["!latex TexActWidthTest.tex",String];
+errorpos=DeleteFile[{"TexActWidthTest.tex","TexActWidthTest.log","TexActWidthTest.aux"}];
+If[errorpos=!=Null,Print["Tex Error: could not delete temporary files"]];
+ResetDirectory[];
+If[Length@Position[TexOut,"xActWidthEnd",1,1]==1,
+ExtractTexWidths@TexOut,
+errorpos=Position[TexOut,str_String?(StringMatchQ[#,StartOfString ~~ "!"~~___]&)];
+If[Length@errorpos>0,
+Print["Tex Error:\n",Sequence@@Drop[TexOut,First@First@errorpos-1]],
+Print["Tex Error:\n",Sequence@@TexOut];
+];
+Throw["Tex Error"]
+]
+];
+
+
+$TexPrintPageWidth=410;
+
+
+TexPrintAlignedEquations[eq_Equal]:=TexPrintAlignedEquations[{eq}]
+
+
+TexPrintAlignedEquations[eqlist:{eqs___Equal}]:=Module[{TexLHS=TexPrint[#[[1]]]&/@eqlist,TexRHS=TexPrint[#[[2]]]&/@eqlist,LHSWidths,MaxRHSWidth},LHSWidths=xAct`TexAct`Private`TexWidths@@(StringJoin[#," ={}"]&/@TexLHS);
+MaxRHSWidth=Round[$TexPrintPageWidth-Max@LHSWidths];
+TexRHS=TexBreak[#,1,TexBreakBy->"Term",TexBreakString->"\n"]&/@TexRHS;
+TexRHS=TexBreak[#,MaxRHSWidth,TexBreakBy->"TexPoint",TexBreakString->"\\nonumber\\\\\n&"]&/@TexRHS;
+TexRHS=StringReplace[#,"\n\\nonumber"->"\\nonumber"]&/@TexRHS;
+StringJoin["\\begin{align}\n",StringJoin[Riffle[MapThread[StringJoin[#1,"={}&",#2]&,{TexLHS,TexRHS}],",\\\\\n"]],".\n\\end{align}"]]
 
 
 End[]

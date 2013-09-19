@@ -26,3 +26,9 @@
 
 18 July - Fixed TexBreak so it only breaks at bracket level 0. -TeXForm crashes when given a StyleBox, so now we remove style boxes before passing anything to TexForm. This also gives a better fix for the problem with the coloured indices.
 -FormatTexBasis introduced.
+
+12 September - Changed $TexInitLatexCode to TexInitLatexCode[] which produces the initial lines of .tex output from $TexInitLatexClassCode, and the lists $TexInitLatexPackages, $TexInitLatexExtraCode
+
+13 September - Added TexView.
+
+16 September - Improved TexView, introduced TexPrintAlignedExpressions and made it possible to use latextextwidth for automatic line breaking parameters.

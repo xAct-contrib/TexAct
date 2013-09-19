@@ -16,7 +16,7 @@ Cell[TextData[{
  StyleBox["Thomas B\[ADoubleDot]ckdahl, Jos\[EAcute] M. Mart\[IAcute]n-Garc\
 \[IAcute]a and Barry Wardell\n",
   FontSize->18],
- "(c) 2008-2013, under GPL\n\nthomas.backdahl@aei.mpg.de, jose@xact.es, \
+ "(c) 2008-2013, under GPL\n\nt.backdahl@ed.ac.uk, jose@xact.es, \
 barry.wardell@gmail.com\nhttp://www.xact.es/\n\
 http://groups.google.com/group/xact"
 }], "Subsubtitle"],
@@ -56,7 +56,7 @@ Cell[BoxData[
 
 Cell[BoxData[
  RowBox[{"{", 
-  RowBox[{"2013", ",", "7", ",", "18", ",", "16", ",", "31", ",", "10"}], 
+  RowBox[{"2013", ",", "9", ",", "16", ",", "15", ",", "18", ",", "30"}], 
   "}"}]], "Output"]
 }, Open  ]],
 
@@ -64,9 +64,9 @@ Cell[BoxData[{
  RowBox[{
   RowBox[{"xAct`TexAct`$Version", "=", 
    RowBox[{"{", 
-    RowBox[{"\"\<0.3.2\>\"", ",", 
+    RowBox[{"\"\<0.3.3\>\"", ",", 
      RowBox[{"{", 
-      RowBox[{"2013", ",", "7", ",", "18"}], "}"}]}], "}"}]}], ";"}], "\n", 
+      RowBox[{"2013", ",", "9", ",", "16"}], "}"}]}], "}"}]}], ";"}], "\n", 
  RowBox[{
   RowBox[{"xAct`TexAct`$xTensorVersionExpected", "=", "\[NoBreak]", 
    RowBox[{"{", 
@@ -282,8 +282,8 @@ Cell[BoxData[
    "\[InvisibleSpace]", "\<\"1.1.0\"\>", "\[InvisibleSpace]", "\<\", \"\>", 
    "\[InvisibleSpace]", 
    RowBox[{"{", 
-    RowBox[{"2013", ",", "7", ",", "1"}], "}"}]}],
-  SequenceForm["Package xAct`xTensor`  version ", "1.1.0", ", ", {2013, 7, 1}],
+    RowBox[{"2013", ",", "9", ",", "1"}], "}"}]}],
+  SequenceForm["Package xAct`xTensor`  version ", "1.1.0", ", ", {2013, 9, 1}],
   Editable->False]], "Print"],
 
 Cell[BoxData["\<\"CopyRight (C) 2002-2013, Jose M. Martin-Garcia, under the \
@@ -348,11 +348,11 @@ Cell[BoxData["\<\"------------------------------------------------------------\
 Cell[BoxData[
  InterpretationBox[
   RowBox[{"\<\"Package xAct`TexAct`  version \"\>", 
-   "\[InvisibleSpace]", "\<\"0.3.2\"\>", "\[InvisibleSpace]", "\<\", \"\>", 
+   "\[InvisibleSpace]", "\<\"0.3.3\"\>", "\[InvisibleSpace]", "\<\", \"\>", 
    "\[InvisibleSpace]", 
    RowBox[{"{", 
-    RowBox[{"2013", ",", "7", ",", "18"}], "}"}]}],
-  SequenceForm["Package xAct`TexAct`  version ", "0.3.2", ", ", {2013, 7, 18}],
+    RowBox[{"2013", ",", "9", ",", "16"}], "}"}]}],
+  SequenceForm["Package xAct`TexAct`  version ", "0.3.3", ", ", {2013, 9, 16}],
   Editable->False]], "Print"],
 
 Cell[BoxData["\<\"CopyRight (C) 2008-2013, Thomas B\[ADoubleDot]ckdahl, Jose \
@@ -540,16 +540,38 @@ of Tex on the elements.\>\""}], ";"}], "\[IndentingNewLine]",
   ";"}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{
-   RowBox[{"$TexDirectory", "::", "usage"}], " ", "=", 
+   RowBox[{"$TexTmpDirectory", "::", "usage"}], " ", "=", 
    "\"\<Directory for placement of the TexActWidthTest.tex file for \
-determining of widths for linebreaking. If no directory is given, the current \
-directory will be used.\>\""}], ";"}], "\[IndentingNewLine]", 
+determining of widths for linebreaking.\>\""}], 
+  ";"}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{
-   RowBox[{"$TexInitLatexCode", "::", "usage"}], " ", "=", 
-   "\"\<The initial lines of the TexActWidthTest.tex file for determining of \
-widths for linebreaking. Observe that \\\\begin{document} sould not be \
-included.\>\""}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{"$TexDirectory", "::", "usage"}], "=", 
+   "\"\<Directory for placement of the output .tex file.\>\""}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"TexInitLatexCode", "::", "usage"}], "=", 
+   "\"\<A function that produces the initial lines of the TexActWidthTest.tex \
+file for determining of widths for linebreaking. Observe that \
+\\\\begin{document} should not be included. This is constructed from the \
+string $TexInitLatexClassCode, and the lists $TexInitLatexPackages, \
+$TexInitLatexExtraCode.\>\""}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"$TexInitLatexClassCode", "::", "usage"}], "=", 
+   "\"\<The document class code for the LaTeX output.\>\""}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"$TexInitLatexPackages", "::", "usage"}], "=", 
+   "\"\<A list of packages for the LaTeX output. This should be a list of \
+strings, where each string has teh form {package}. This is then transformed \
+to \\\\usepackage{package}\>\""}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"$TexInitLatexExtraCode", "::", "usage"}], "=", 
+   "\"\<Extra lines for definition of special LaTeX commands. This should be \
+a list of strings.\>\""}], ";"}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{
    RowBox[{"TexPrintAlignedEquations", "::", "usage"}], " ", "=", 
@@ -559,13 +581,55 @@ exceed $TexPrintPageWidth.\>\""}], ";"}], "\[IndentingNewLine]",
  RowBox[{
   RowBox[{
    RowBox[{"$TexPrintPageWidth", "::", "usage"}], " ", "=", " ", 
-   "\"\<Parameter to adjust the line breaking for \
-TexPrintAlignedEquations\>\""}], ";"}], "\[IndentingNewLine]", 
+   "\"\<Parameter to adjust the line breaking for TexPrintAlignedEquations. \
+This is measured in printer points. Observe that you can use the textwidth \
+variable which is read from the latex environment.\>\""}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"latextextwidth", "::", "usage"}], "=", 
+   "\"\<A symbol representing the textwidth variable in the current latex \
+environment.\>\""}], ";"}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{
    RowBox[{"FormatTexBasis", "::", "usage"}], " ", "=", 
    "\"\<FormatTexBasis works the same way as FormatBasis, but for the Tex \
-output.\>\""}], ";"}]}], "Input",
+output.\>\""}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"EquationMarks", "::", "usage"}], " ", "=", 
+   "\"\<An option for TexBreak to include \\\\begin{equation} \
+\\\\end{equation} or similar constructions. Default is False, but a standard \
+value would be equation as a string. Warning, do not use this on TexPrint if \
+the result is passed to TexBreak.\>\""}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"AddEquationMarks", "::", "usage"}], "=", 
+   "\"\<Adds \\\\begin{equation} \\\\end{equation} or similar constructions \
+to a tex string. The default is Automatic which makes an educated \
+guess.\>\""}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"TexView", "::", "usage"}], "=", 
+   "\"\<Compile and view tex output.\>\""}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"$LatexExecutable", "::", "usage"}], " ", "=", 
+   "\"\<Command for compiling LaTeX. The default is pdflatex. Add the path to \
+the file if the default value does not work.\>\""}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"$TexViewExt", "::", "usage"}], " ", "=", " ", 
+   "\"\<The file extension for output file to view. The defailt is .pdf. If \
+you want to open the .tex file in your default editor use .tex instead. \
+Observe however that TexView overwrites files without asking so editing this \
+file might not be a good idea.\>\""}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"TexPrintAlignedExpressions", "::", "usage"}], "=", 
+   "\"\<Takes a list of expressions, and typesets them in an aligned \
+environment.\>\""}], ";"}]}], "Input",
  InitializationCell->True]
 }, Closed]],
 
@@ -928,7 +992,7 @@ Cell[BoxData[{
          RowBox[{"Heads", "\[Rule]", "True"}]}], "]"}]}]}], ";"}]}], 
    "\[IndentingNewLine]", "]"}]}]}], "Input"]
 }, Closed]]
-}, Closed]],
+}, Open  ]],
 
 Cell[CellGroupData[{
 
@@ -3147,7 +3211,7 @@ Cell[BoxData[
         RowBox[{"UpIndex", " ", "@", "index"}], "]"}]}], "]"}]}]}], 
    "]"}]}]], "Input",
  InitializationCell->True]
-}, Open  ]]
+}, Closed]]
 }, Closed]],
 
 Cell[CellGroupData[{
@@ -3195,19 +3259,20 @@ Cell[BoxData[
    RowBox[{"Options", "[", "TexBreak", "]"}], "=", 
    RowBox[{"{", 
     RowBox[{
-     RowBox[{"TexBreakBy", "->", "\"\<Character\>\""}], ",", 
-     RowBox[{"TexBreakAt", "->", 
+     RowBox[{"TexBreakBy", "\[Rule]", "\"\<Character\>\""}], ",", 
+     RowBox[{"TexBreakAt", "\[Rule]", 
       RowBox[{"\"\< + \>\"", "|", "\"\< - \>\""}]}], ",", 
      RowBox[{
-     "TexBreakString", "->", "\"\< \\\\nonumber \\\\\\\\ \\n&&\>\""}]}], 
-    "}"}]}], ";"}]], "Input",
+     "TexBreakString", "\[Rule]", "\"\< \\\\nonumber \\\\\\\\ \\n&&\>\""}], 
+     ",", 
+     RowBox[{"EquationMarks", "\[Rule]", "False"}]}], "}"}]}], ";"}]], "Input",
  InitializationCell->True],
 
 Cell[BoxData[
  RowBox[{
   RowBox[{"BreakingFunction", "[", 
    RowBox[{"rulelist_", ",", "n_"}], "]"}], ":=", 
-  RowBox[{"Module", "[", 
+  RowBox[{"With", "[", 
    RowBox[{
     RowBox[{"{", 
      RowBox[{"best", "=", 
@@ -3233,8 +3298,7 @@ Cell[BoxData[{
   RowBox[{
    RowBox[{
     RowBox[{"TexBreak", "[", 
-     RowBox[{
-     "string_String", ",", "n_Integer", ",", "l_List", ",", "options___"}], 
+     RowBox[{"string_String", ",", "n_", ",", "l_List", ",", "options___"}], 
      "]"}], ":=", 
     RowBox[{"Module", "[", 
      RowBox[{
@@ -3242,18 +3306,19 @@ Cell[BoxData[{
        RowBox[{
        "splittablePositions", ",", "breakat", ",", "breakby", ",", 
         "breakstring", ",", "splitat", ",", "positions", ",", "perLine", ",", 
-        "splitted", ",", "texedwidth", ",", "splitstructure"}], "}"}], ",", 
-      "\[IndentingNewLine]", 
+        "splitted", ",", "texedwidth", ",", "splitstructure", ",", "mark", 
+        ",", "pagewidth"}], "}"}], ",", "\[IndentingNewLine]", 
       RowBox[{
        RowBox[{
         RowBox[{"{", 
-         RowBox[{"breakat", ",", "breakby", ",", "breakstring"}], "}"}], "=", 
-        
+         RowBox[{"breakat", ",", "breakby", ",", "breakstring", ",", "mark"}],
+          "}"}], "=", 
         RowBox[{
          RowBox[{
           RowBox[{"{", 
-           RowBox[{"TexBreakAt", ",", "TexBreakBy", ",", "TexBreakString"}], 
-           "}"}], "/.", 
+           RowBox[{
+           "TexBreakAt", ",", "TexBreakBy", ",", "TexBreakString", ",", " ", 
+            "EquationMarks"}], "}"}], "/.", 
           RowBox[{"CheckOptions", "[", "options", "]"}]}], "/.", 
          RowBox[{"Options", "[", "TexBreak", "]"}]}]}], ";", 
        "\[IndentingNewLine]", "\[IndentingNewLine]", 
@@ -3561,6 +3626,11 @@ Cell[BoxData[{
           RowBox[{"texedwidth", "=", 
            RowBox[{"TexWidths", "@@", "splitted"}]}], ";", 
           "\[IndentingNewLine]", 
+          RowBox[{"pagewidth", "=", 
+           RowBox[{"First", "@", "texedwidth"}]}], ";", "\[IndentingNewLine]", 
+          RowBox[{"texedwidth", "=", 
+           RowBox[{"Rest", "@", "texedwidth"}]}], ";", "\[IndentingNewLine]", 
+          
           RowBox[{"Module", "[", 
            RowBox[{
             RowBox[{"{", "nearestTerm", "}"}], ",", "\[IndentingNewLine]", 
@@ -3589,9 +3659,11 @@ Cell[BoxData[{
                     RowBox[{"Accumulate", "@", "texedwidth"}], ",", " ", 
                     RowBox[{"Range", "@", 
                     RowBox[{"Length", "@", "texedwidth"}]}]}], "]"}]}], ",", 
-                   RowBox[{"perLine", "[", 
-                    RowBox[{"[", "1", "]"}], "]"}]}], "]"}]}], ";", 
-                "\[IndentingNewLine]", 
+                   RowBox[{
+                    RowBox[{"perLine", "[", 
+                    RowBox[{"[", "1", "]"}], "]"}], "/.", 
+                    RowBox[{"latextextwidth", "->", "pagewidth"}]}]}], 
+                  "]"}]}], ";", "\[IndentingNewLine]", 
                 RowBox[{"perLine", "=", 
                  RowBox[{"Rest", "@", 
                   RowBox[{"Normal", "@", "perLine"}]}]}], ";", 
@@ -3643,7 +3715,9 @@ Cell[BoxData[{
                     RowBox[{"Accumulate", "@", "texedwidth"}], ",", " ", 
                     RowBox[{"Range", "@", 
                     RowBox[{"Length", "@", "texedwidth"}]}]}], "]"}]}], ",", 
-                   "n"}], "]"}]}], ";", "\[IndentingNewLine]", 
+                   RowBox[{"n", "/.", 
+                    RowBox[{"latextextwidth", "->", "pagewidth"}]}]}], 
+                  "]"}]}], ";", "\[IndentingNewLine]", 
                 RowBox[{"If", "[", 
                  RowBox[{
                   RowBox[{"nearestTerm", "\[LessEqual]", 
@@ -3678,15 +3752,18 @@ Cell[BoxData[{
        RowBox[{"(*", " ", 
         RowBox[{"Split", " ", "string"}], " ", "*)"}], "\[IndentingNewLine]", 
        
-       RowBox[{"StringInsert", "[", 
-        RowBox[{"string", ",", "breakstring", ",", "positions"}], "]"}]}]}], 
-     "\[IndentingNewLine]", "]"}]}], ";"}], "\[IndentingNewLine]", 
+       RowBox[{"AddEquationMarks", "[", 
+        RowBox[{
+         RowBox[{"StringInsert", "[", 
+          RowBox[{"string", ",", "breakstring", ",", "positions"}], "]"}], 
+         ",", "mark"}], "]"}]}]}], "\[IndentingNewLine]", "]"}]}], ";"}], 
+  "\[IndentingNewLine]", 
   RowBox[{"(*", " ", 
    RowBox[{"Shortcuts", " ", "and", " ", "defaults"}], " ", "*)"}]}], "\n", 
  RowBox[{
   RowBox[{
    RowBox[{"TexBreak", "[", 
-    RowBox[{"string_String", ",", "n_Integer", ",", "options___"}], "]"}], ":=", 
+    RowBox[{"string_String", ",", "n_", ",", "options___"}], "]"}], ":=", 
    RowBox[{"TexBreak", "[", 
     RowBox[{"string", ",", "n", ",", 
      RowBox[{"{", "}"}], ",", "options"}], "]"}]}], 
@@ -3709,27 +3786,72 @@ Cell["\<\
 Thomas\[CloseCurlyQuote] code for determining the widths of a sequence of tex \
 expressions measured in printer points. 
 A file TexActWidthTest.tex is written and passed to the inline latex command. \
-The widths are then extracted from the output.\
+The widths are then extracted from the output.The first output is the latex \
+textwidth environment variable.\
 \>", "Text"],
 
 Cell[BoxData[
  RowBox[{
-  RowBox[{"$TexDirectory", "=", "$TemporaryDirectory"}], ";"}]], "Input",
+  RowBox[{"Protect", "[", "latextextwidth", "]"}], ";"}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"$TexDirectory", "=", "$TemporaryDirectory"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"$TexTmpDirectory", "=", "$TemporaryDirectory"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"$LatexExecutable", "=", "\"\<pdflatex\>\""}], ";"}]}], "Input",
  InitializationCell->True],
 
 Cell[BoxData[
  RowBox[{
   RowBox[{
-  "$TexInitLatexCode", "=", 
-   "\"\<\\\\documentclass[10pt,a4paper]{article}\n\\\\usepackage{amssymb}\n\\\
-\\usepackage{amsmath}\n\\\\usepackage{amsthm}\n\
-\\\\usepackage{latexsym}\\n\>\""}], ";"}]], "Input",
+  "$TexInitLatexClassCode", "=", 
+   "\"\<\\\\documentclass[10pt,a4paper]{article}\>\""}], ";"}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"$TexInitLatexPackages", "=", 
+   RowBox[{"{", 
+    RowBox[{
+    "\"\<{amssymb}\>\"", ",", " ", "\"\<{amsmath}\>\"", ",", " ", 
+     "\"\<{amsthm}\>\"", ",", " ", "\"\<{latexsym}\>\""}], "}"}]}], 
+  ";"}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"$TexInitLatexExtraCode", "=", 
+   RowBox[{"{", "}"}]}], ";"}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"TexInitLatexCode", "[", "]"}], ":=", 
+  RowBox[{"StringJoin", "[", 
+   RowBox[{"$TexInitLatexClassCode", ",", 
+    RowBox[{"StringJoin", "[", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"StringJoin", "[", 
+        RowBox[{"\"\<\\\\usepackage\>\"", ",", "#", ",", "\"\<\\n\>\""}], 
+        "]"}], "&"}], "/@", "$TexInitLatexPackages"}], "]"}], ",", 
+    RowBox[{"StringJoin", "[", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"StringJoin", "[", 
+        RowBox[{"#", ",", "\"\<\\n\>\""}], "]"}], "&"}], "/@", 
+      "$TexInitLatexExtraCode"}], "]"}]}], "]"}]}]], "Input",
  InitializationCell->True],
 
 Cell[BoxData[
  RowBox[{
   RowBox[{
-   RowBox[{"TexActWriteFile", "[", "strs___", "]"}], ":=", 
+   RowBox[{"TexWidthsWriteFile", "[", "strs___", "]"}], ":=", 
    "\[IndentingNewLine]", 
    RowBox[{"Module", "[", 
     RowBox[{
@@ -3739,7 +3861,8 @@ Cell[BoxData[
       "}"}], ",", "\[IndentingNewLine]", 
      RowBox[{
       RowBox[{"WriteString", "[", 
-       RowBox[{"tmpfile", ",", "$TexInitLatexCode"}], "]"}], ";", 
+       RowBox[{"tmpfile", ",", 
+        RowBox[{"TexInitLatexCode", "[", "]"}]}], "]"}], ";", 
       "\[IndentingNewLine]", 
       RowBox[{"WriteString", "[", 
        RowBox[{
@@ -3761,6 +3884,11 @@ hbox{${}#1$}}\n\\\\immediate\\\\write0{\\\\the\\\\widthofexpr}}\n\
        RowBox[{
        "tmpfile", ",", "\"\<\\\\immediate\\\\write0{xActWidthStart}\\n\>\""}],
         "]"}], ";", "\[IndentingNewLine]", 
+      RowBox[{"WriteString", "[", 
+       RowBox[{
+       "tmpfile", ",", 
+        "\"\<\\\\immediate\\\\write0{\\\\the\\\\textwidth}\\n\>\""}], "]"}], 
+      ";", "\[IndentingNewLine]", 
       RowBox[{
        RowBox[{
         RowBox[{"WriteString", "[", 
@@ -3821,14 +3949,17 @@ Cell[BoxData[
       RowBox[{"TexOut", ",", "errorpos"}], "}"}], ",", "\[IndentingNewLine]", 
      
      RowBox[{
-      RowBox[{"SetDirectory", "[", "$TexDirectory", "]"}], ";", 
+      RowBox[{"SetDirectory", "[", "$TexTmpDirectory", "]"}], ";", 
       "\[IndentingNewLine]", 
-      RowBox[{"TexActWriteFile", "[", "strs", "]"}], ";", 
+      RowBox[{"TexWidthsWriteFile", "[", "strs", "]"}], ";", 
       "\[IndentingNewLine]", 
       RowBox[{"TexOut", "=", 
        RowBox[{"ReadList", "[", 
-        RowBox[{"\"\<!latex TexActWidthTest.tex\>\"", ",", "String"}], 
-        "]"}]}], ";", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{
+         "\"\<!\>\"", "<>", "$LatexExecutable", "<>", 
+          "\"\< TexActWidthTest.tex\>\""}], ",", "String"}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
       RowBox[{"errorpos", "=", 
        RowBox[{"DeleteFile", "[", 
         RowBox[{"{", 
@@ -3902,7 +4033,7 @@ aligned environment. Use $TexprintPageWidth to adjust the linebreaking.\
 
 Cell[BoxData[
  RowBox[{
-  RowBox[{"$TexPrintPageWidth", "=", "410"}], ";"}]], "Input",
+  RowBox[{"$TexPrintPageWidth", "=", "latextextwidth"}], ";"}]], "Input",
  InitializationCell->True],
 
 Cell[BoxData[
@@ -3914,9 +4045,31 @@ Cell[BoxData[
 
 Cell[BoxData[
  RowBox[{
+  RowBox[{"LHSpart", "[", 
+   RowBox[{"a_", "\[Equal]", "b_"}], "]"}], ":=", "a"}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"RHSpart", "[", 
+   RowBox[{"a_", "\[Equal]", "b_"}], "]"}], ":=", "b"}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"LHSpart", "[", "b_", "]"}], ":=", "\"\<\>\""}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"RHSpart", "[", "b_", "]"}], ":=", "b"}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
   RowBox[{"TexPrintAlignedEquations", "[", 
    RowBox[{"eqlist", ":", 
-    RowBox[{"{", "eqs___Equal", "}"}]}], "]"}], ":=", 
+    RowBox[{"{", "eqs___", "}"}]}], "]"}], ":=", 
   RowBox[{"Module", "[", 
    RowBox[{
     RowBox[{"{", 
@@ -3925,16 +4078,14 @@ Cell[BoxData[
        RowBox[{
         RowBox[{
          RowBox[{"TexPrint", "[", 
-          RowBox[{"#", "[", 
-           RowBox[{"[", "1", "]"}], "]"}], "]"}], "&"}], "/@", "eqlist"}]}], 
+          RowBox[{"LHSpart", "@", "#"}], "]"}], "&"}], "/@", "eqlist"}]}], 
       ",", 
       RowBox[{"TexRHS", "=", 
        RowBox[{
         RowBox[{
          RowBox[{"TexPrint", "[", 
-          RowBox[{"#", "[", 
-           RowBox[{"[", "2", "]"}], "]"}], "]"}], "&"}], "/@", "eqlist"}]}], 
-      ",", "LHSWidths", ",", "MaxRHSWidth"}], "}"}], ",", 
+          RowBox[{"RHSpart", "@", "#"}], "]"}], "&"}], "/@", "eqlist"}]}], 
+      ",", "LHSWidths", ",", "MaxRHSWidth", ",", "pagewidth"}], "}"}], ",", 
     RowBox[{
      RowBox[{"LHSWidths", "=", 
       RowBox[{"xAct`TexAct`Private`TexWidths", "@@", 
@@ -3944,9 +4095,16 @@ Cell[BoxData[
           RowBox[{"StringJoin", "[", 
            RowBox[{"#", ",", "\"\< ={}\>\""}], "]"}], "&"}], "/@", "TexLHS"}],
          ")"}]}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"pagewidth", "=", 
+      RowBox[{"First", "@", "LHSWidths"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"LHSWidths", "=", 
+      RowBox[{"Rest", "@", "LHSWidths"}]}], ";", "\[IndentingNewLine]", 
      RowBox[{"MaxRHSWidth", "=", 
       RowBox[{"Round", "[", 
-       RowBox[{"$TexPrintPageWidth", "-", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"$TexPrintPageWidth", "/.", 
+          RowBox[{"latextextwidth", "\[Rule]", "pagewidth"}]}], ")"}], "-", 
         RowBox[{"Max", "@", "LHSWidths"}]}], "]"}]}], ";", 
      "\[IndentingNewLine]", 
      RowBox[{"TexRHS", "=", 
@@ -3976,26 +4134,312 @@ Cell[BoxData[
          "]"}], "&"}], "/@", "TexRHS"}]}], ";", "\[IndentingNewLine]", 
      RowBox[{"StringJoin", "[", 
       RowBox[{"\"\<\\\\begin{align}\\n\>\"", ",", 
+       RowBox[{"StringReplace", "[", 
+        RowBox[{
+         RowBox[{"StringJoin", "[", 
+          RowBox[{"Riffle", "[", 
+           RowBox[{
+            RowBox[{"MapThread", "[", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"StringJoin", "[", 
+                RowBox[{"#1", ",", "\"\<={}&\>\"", ",", "#2"}], "]"}], "&"}], 
+              ",", 
+              RowBox[{"{", 
+               RowBox[{"TexLHS", ",", "TexRHS"}], "}"}]}], "]"}], ",", 
+            "\"\<,\\\\\\\\\\n\>\""}], "]"}], "]"}], ",", 
+         RowBox[{
+         "\"\<,\\\\\\\\\\n=\>\"", "\[Rule]", " ", "\"\<\\\\\\\\\\n=\>\""}]}], 
+        "]"}], ",", "\"\<.\\n\\\\end{align}\>\""}], "]"}]}]}], 
+   "]"}]}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"TexPrintAlignedExpressions", "[", "list_List", "]"}], ":=", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"Texed", "=", 
+      RowBox[{"TexPrint", "/@", "list"}]}], "}"}], ",", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"Texed", "=", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"TexBreak", "[", 
+         RowBox[{"#", ",", "1", ",", 
+          RowBox[{"TexBreakBy", "\[Rule]", "\"\<Term\>\""}], ",", 
+          RowBox[{"TexBreakString", "\[Rule]", "\"\<\\n\>\""}]}], "]"}], 
+        "&"}], "/@", "Texed"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"Texed", "=", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"TexBreak", "[", 
+         RowBox[{"#", ",", "$TexPrintPageWidth", ",", 
+          RowBox[{"TexBreakBy", "\[Rule]", "\"\<TexPoint\>\""}], ",", 
+          RowBox[{
+          "TexBreakString", "\[Rule]", "\"\<\\\\nonumber\\\\\\\\\\n&\>\""}]}],
+          "]"}], "&"}], "/@", "Texed"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"Texed", "=", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"StringReplace", "[", 
+         RowBox[{"#", ",", 
+          RowBox[{
+          "\"\<\\n\\\\nonumber\>\"", "\[Rule]", "\"\<\\\\nonumber\>\""}]}], 
+         "]"}], "&"}], "/@", "Texed"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"StringJoin", "[", 
+      RowBox[{"\"\<\\\\begin{align}\\n&\>\"", ",", 
        RowBox[{"StringJoin", "[", 
         RowBox[{"Riffle", "[", 
-         RowBox[{
-          RowBox[{"MapThread", "[", 
-           RowBox[{
-            RowBox[{
-             RowBox[{"StringJoin", "[", 
-              RowBox[{"#1", ",", "\"\<={}&\>\"", ",", "#2"}], "]"}], "&"}], 
-            ",", 
-            RowBox[{"{", 
-             RowBox[{"TexLHS", ",", "TexRHS"}], "}"}]}], "]"}], ",", 
-          "\"\<,\\\\\\\\\\n\>\""}], "]"}], "]"}], ",", 
+         RowBox[{"Texed", ",", "\"\<,\\\\\\\\\\n&\>\""}], "]"}], "]"}], ",", 
        "\"\<.\\n\\\\end{align}\>\""}], "]"}]}]}], "]"}]}]], "Input",
  InitializationCell->True]
 }, Closed]]
-}, Closed]],
+}, Open  ]],
 
 Cell[CellGroupData[{
 
-Cell["6. EndPackage", "Section",
+Cell["6. TexView", "Section",
+ FontColor->RGBColor[0, 0, 1]],
+
+Cell[CellGroupData[{
+
+Cell["6.1. TexView", "Subsection"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"$TexViewExt", "=", "\"\<.pdf\>\""}], ";"}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"AddEquationMarks", "[", 
+    RowBox[{"string_", ",", 
+     RowBox[{"mark_:", "Automatic"}]}], "]"}], ":=", 
+   RowBox[{"Switch", "[", 
+    RowBox[{
+    "mark", ",", "\[IndentingNewLine]", "False", ",", " ", "string", ",", 
+     "\[IndentingNewLine]", "Automatic", ",", " ", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"StringTake", "[", 
+         RowBox[{"string", ",", "6"}], "]"}], "===", "\"\<\\\\begin\>\""}], 
+       ",", "string", ",", "\[IndentingNewLine]", 
+       RowBox[{"If", "[", 
+        RowBox[{
+         RowBox[{"Not", "@", 
+          RowBox[{"StringMatchQ", "[", 
+           RowBox[{"string", ",", 
+            RowBox[{"___", "~~", " ", "\"\<\\\\\\\\\>\"", "~~", "___"}]}], 
+           "]"}]}], ",", 
+         RowBox[{"AddEquationMarks", "[", 
+          RowBox[{"string", ",", "\"\<equation\>\""}], "]"}], ",", 
+         "\[IndentingNewLine]", 
+         RowBox[{"With", "[", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{"firstlinebreak", "=", 
+             RowBox[{"Last", "@", 
+              RowBox[{"First", "@", 
+               RowBox[{"StringPosition", "[", 
+                RowBox[{"string", ",", " ", "\"\<\\\\\\\\\>\"", ",", "1"}], 
+                "]"}]}]}]}], "}"}], ",", "\[IndentingNewLine]", 
+           RowBox[{"If", "[", 
+            RowBox[{
+             RowBox[{"StringMatchQ", "[", 
+              RowBox[{
+               RowBox[{"StringTake", "[", 
+                RowBox[{"string", ",", "firstlinebreak"}], "]"}], ",", 
+               RowBox[{"___", "~~", "\"\<&\>\"", "~~", "___"}]}], "]"}], ",", 
+             "\[IndentingNewLine]", 
+             RowBox[{"AddEquationMarks", "[", 
+              RowBox[{"string", ",", "\"\<eqnarray\>\""}], "]"}], ",", 
+             "\[IndentingNewLine]", 
+             RowBox[{"If", "[", 
+              RowBox[{
+               RowBox[{"StringMatchQ", "[", 
+                RowBox[{
+                 RowBox[{"StringTake", "[", 
+                  RowBox[{"string", ",", "firstlinebreak"}], "]"}], ",", 
+                 RowBox[{"___", "~~", "\"\<=\>\"", "~~", "___"}]}], "]"}], 
+               ",", "\[IndentingNewLine]", 
+               RowBox[{"AddEquationMarks", "[", 
+                RowBox[{
+                 RowBox[{"StringReplace", "[", 
+                  RowBox[{"string", ",", 
+                   RowBox[{"\"\<=\>\"", "\[Rule]", "\"\<&=&\>\""}], ",", 
+                   "1"}], "]"}], ",", "\"\<eqnarray\>\""}], "]"}], ",", 
+               "\[IndentingNewLine]", 
+               RowBox[{"AddEquationMarks", "[", 
+                RowBox[{
+                 RowBox[{"StringJoin", "[", 
+                  RowBox[{"\"\<&&\>\"", ",", "string"}], "]"}], ",", 
+                 "\"\<eqnarray\>\""}], "]"}]}], "]"}]}], "]"}]}], "]"}]}], 
+        "]"}]}], "]"}], ",", "\[IndentingNewLine]", "_", ",", " ", 
+     RowBox[{"StringJoin", "[", 
+      RowBox[{
+      "\"\<\\\\begin{\>\"", ",", "mark", ",", "\"\<}\\n\>\"", ",", " ", 
+       "string", ",", " ", "\"\<\\n\\\\end{\>\"", ",", "mark", ",", 
+       "\"\<}\\n\>\""}], "]"}]}], "]"}]}], ";"}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"TexWriteFile", "[", 
+    RowBox[{"str_String", ",", "file_String"}], "]"}], ":=", 
+   "\[IndentingNewLine]", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"outfile", "=", 
+       RowBox[{"OpenWrite", "[", "file", "]"}]}], "}"}], ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"WriteString", "[", 
+       RowBox[{"outfile", ",", 
+        RowBox[{"TexInitLatexCode", "[", "]"}]}], "]"}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"WriteString", "[", 
+       RowBox[{"outfile", ",", "\"\<\\\\begin{document}\\n\>\""}], "]"}], ";",
+       "\[IndentingNewLine]", 
+      RowBox[{"WriteString", "[", 
+       RowBox[{"outfile", ",", "str"}], "]"}], ";", "\[IndentingNewLine]", 
+      RowBox[{"WriteString", "[", 
+       RowBox[{
+       "outfile", ",", 
+        "\"\<\\\\immediate\\\\write0{TexActFinished}\n\
+\\\\end{document}\>\""}], "]"}], ";", "\[IndentingNewLine]", 
+      RowBox[{"Close", "[", "outfile", "]"}], ";"}]}], "]"}]}], 
+  ";"}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"TexView", "[", 
+    RowBox[{"texstr_String", ",", 
+     RowBox[{"file_String:", "\"\<TexActView\>\""}]}], "]"}], ":=", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"TexOut", ",", "errorpos"}], "}"}], ",", "\[IndentingNewLine]", 
+     
+     RowBox[{
+      RowBox[{"SetDirectory", "[", "$TexDirectory", "]"}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"TexWriteFile", "[", 
+       RowBox[{"texstr", ",", 
+        RowBox[{"StringJoin", "[", 
+         RowBox[{"file", ",", "\"\<.tex\>\""}], "]"}]}], "]"}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"TexOut", "=", 
+       RowBox[{"ReadList", "[", 
+        RowBox[{
+         RowBox[{"StringJoin", "[", 
+          RowBox[{
+           RowBox[{"\"\<!\>\"", "<>", "$LatexExecutable", "<>", "\"\< \>\""}],
+            ",", "file", ",", "\"\<.tex\>\""}], "]"}], ",", "String"}], 
+        "]"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"ResetDirectory", "[", "]"}], ";", "\[IndentingNewLine]", 
+      RowBox[{"If", "[", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"Length", "@", 
+          RowBox[{"Position", "[", 
+           RowBox[{
+           "TexOut", ",", "\"\<TexActFinished\>\"", ",", "1", ",", "1"}], 
+           "]"}]}], "\[Equal]", "1"}], ",", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{"SetDirectory", "[", "$TexDirectory", "]"}], ";", 
+         "\[IndentingNewLine]", 
+         RowBox[{"Print", "[", "\"\<Typesetting OK.\>\"", "]"}], ";", 
+         "\[IndentingNewLine]", 
+         RowBox[{"Print", "[", 
+          RowBox[{
+          "\"\<Opening file: \>\"", ",", " ", "file", ",", "$TexViewExt"}], 
+          "]"}], ";", "\[IndentingNewLine]", 
+         RowBox[{"SystemOpen", "[", 
+          RowBox[{"StringJoin", "[", 
+           RowBox[{"file", ",", "$TexViewExt"}], "]"}], "]"}], ";", 
+         "\[IndentingNewLine]", 
+         RowBox[{"ResetDirectory", "[", "]"}], ";"}], ",", 
+        "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{"errorpos", "=", 
+          RowBox[{"Position", "[", 
+           RowBox[{"TexOut", ",", 
+            RowBox[{"str_String", "?", 
+             RowBox[{"(", 
+              RowBox[{
+               RowBox[{"StringMatchQ", "[", 
+                RowBox[{"#", ",", 
+                 RowBox[{
+                 "StartOfString", " ", "~~", " ", "\"\<!\>\"", "~~", 
+                  "___"}]}], "]"}], "&"}], ")"}]}]}], "]"}]}], ";", 
+         "\[IndentingNewLine]", 
+         RowBox[{"If", "[", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"Length", "@", "errorpos"}], ">", "0"}], ",", 
+           "\[IndentingNewLine]", 
+           RowBox[{"Print", "[", 
+            RowBox[{"\"\<Tex Error:\\n\>\"", ",", 
+             RowBox[{"Sequence", "@@", 
+              RowBox[{"Drop", "[", 
+               RowBox[{"TexOut", ",", 
+                RowBox[{
+                 RowBox[{"First", "@", 
+                  RowBox[{"First", "@", "errorpos"}]}], "-", "1"}]}], 
+               "]"}]}]}], "]"}], ",", "\[IndentingNewLine]", 
+           RowBox[{
+            RowBox[{"Print", "[", 
+             RowBox[{"\"\<Tex Error:\\n\>\"", ",", 
+              RowBox[{"Sequence", "@@", "TexOut"}]}], "]"}], ";"}]}], 
+          "\[IndentingNewLine]", "]"}], ";", "\[IndentingNewLine]", 
+         RowBox[{"Throw", "[", "\"\<Tex Error\>\"", "]"}]}]}], 
+       "\[IndentingNewLine]", "]"}]}]}], "\[IndentingNewLine]", "]"}]}], 
+  ";"}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"TexView", "[", 
+   RowBox[{"eqlist", ":", 
+    RowBox[{"{", 
+     RowBox[{"eq_Equal", ",", "eqs___"}], " ", "}"}]}], "]"}], ":=", 
+  RowBox[{"TexView", "@", 
+   RowBox[{
+   "TexPrintAlignedEquations", "[", "eqlist", 
+    "]"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"TexView", "[", "list_List", "]"}], ":=", 
+  RowBox[{"TexView", "@", 
+   RowBox[{
+   "TexPrintAlignedExpressions", "[", "list", 
+    "]"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"TexView", "[", "eq_Equal", "]"}], ":=", 
+  RowBox[{"TexView", "@", 
+   RowBox[{
+   "TexPrintAlignedEquations", "[", "eq", "]"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"TexView", "[", "expr_", "]"}], ":=", 
+  RowBox[{"TexView", "@", 
+   RowBox[{"AddEquationMarks", "[", 
+    RowBox[{
+     RowBox[{"TexPrint", "[", "expr", "]"}], ",", "Automatic"}], 
+    "]"}]}]}]}], "Input",
+ InitializationCell->True]
+}, Closed]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["7. EndPackage", "Section",
  FontColor->RGBColor[0, 0, 1]],
 
 Cell[CellGroupData[{
@@ -4014,7 +4458,7 @@ Cell[BoxData[
 
 Cell[CellGroupData[{
 
-Cell["7. Examples", "Section",
+Cell["8. Examples", "Section",
  FontColor->RGBColor[0, 0, 1]],
 
 Cell[CellGroupData[{
@@ -4113,18 +4557,19 @@ Cell[BoxData[
 Cell[CellGroupData[{
 
 Cell[BoxData[
- RowBox[{
+ RowBox[{"expr1", "=", 
   RowBox[{
-   RowBox[{"-", "3"}], 
-   RowBox[{"T", "[", 
-    RowBox[{"a", ",", 
-     RowBox[{"-", "b"}], ",", "c"}], "]"}]}], "+", 
-  RowBox[{"7", 
-   RowBox[{"T", "[", 
-    RowBox[{"d", ",", "f"}], "]"}]}], "+", 
-  RowBox[{"Pi", " ", 
-   RowBox[{"T", "[", 
-    RowBox[{"g", ",", "f"}], "]"}]}], "-", "5"}]], "Input"],
+   RowBox[{
+    RowBox[{"-", "3"}], 
+    RowBox[{"T", "[", 
+     RowBox[{"a", ",", 
+      RowBox[{"-", "b"}], ",", "c"}], "]"}]}], "+", 
+   RowBox[{"7", 
+    RowBox[{"T", "[", 
+     RowBox[{"d", ",", "f"}], "]"}]}], "+", 
+   RowBox[{"Pi", " ", 
+    RowBox[{"T", "[", 
+     RowBox[{"g", ",", "f"}], "]"}]}], "-", "5"}]}]], "Input"],
 
 Cell[BoxData[
  RowBox[{
@@ -4221,7 +4666,7 @@ Cell[BoxData[
 Cell[CellGroupData[{
 
 Cell[BoxData[
- RowBox[{"Tex", "[", "%", "]"}]], "Input"],
+ RowBox[{"Tex", "[", "expr1", "]"}]], "Input"],
 
 Cell[BoxData["\<\"-5 + 7 \\\\tau^{df} + \\\\pi \\\\tau^{gf} + -3 \
 \\\\tau^{a}{}_{b}{}^{c}\"\>"], "Output"]
@@ -4230,10 +4675,21 @@ Cell[BoxData["\<\"-5 + 7 \\\\tau^{df} + \\\\pi \\\\tau^{gf} + -3 \
 Cell[CellGroupData[{
 
 Cell[BoxData[
- RowBox[{"TexPrint", "[", "%%", "]"}]], "Input"],
+ RowBox[{"TexPrint", "[", "expr1", "]"}]], "Input"],
 
 Cell[BoxData["\<\"-5 + 7 \\\\tau^{df} + \\\\pi \\\\tau^{gf} - 3 \
 \\\\tau^{a}{}_{b}{}^{c}\"\>"], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"AddEquationMarks", "[", 
+  RowBox[{"%", ",", "\"\<equation*\>\""}], "]"}]], "Input"],
+
+Cell[BoxData["\<\"\\\\begin{equation*}\\n-5 + 7 \\\\tau^{df} + \\\\pi \
+\\\\tau^{gf} - 3 \\\\tau^{a}{}_{b}{}^{c}\\n\\\\end{equation*}\\n\"\>"], \
+"Output"]
 }, Open  ]],
 
 Cell[BoxData[{
@@ -5430,12 +5886,12 @@ Cell[BoxData["\<\"------------------------------------------------------------\
 Cell[BoxData[
  InterpretationBox[
   RowBox[{"\<\"Package xAct`SymManipulator`  version \"\>", 
-   "\[InvisibleSpace]", "\<\"0.8.5\"\>", "\[InvisibleSpace]", "\<\", \"\>", 
+   "\[InvisibleSpace]", "\<\"0.8.6\"\>", "\[InvisibleSpace]", "\<\", \"\>", 
    "\[InvisibleSpace]", 
    RowBox[{"{", 
-    RowBox[{"2013", ",", "7", ",", "17"}], "}"}]}],
+    RowBox[{"2013", ",", "9", ",", "15"}], "}"}]}],
   SequenceForm[
-  "Package xAct`SymManipulator`  version ", "0.8.5", ", ", {2013, 7, 17}],
+  "Package xAct`SymManipulator`  version ", "0.8.6", ", ", {2013, 9, 15}],
   Editable->False]], "Print"],
 
 Cell[BoxData["\<\"CopyRight (C) 2011-2013, Thomas B\[ADoubleDot]ckdahl, under \
@@ -7463,10 +7919,14 @@ Cell[BoxData[
     Editable->False]}]}]], "Output"]
 }, Open  ]],
 
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"$TexPrintPageWidth", "=", "latextextwidth"}], ";"}]], "Input"],
+
 Cell[CellGroupData[{
 
 Cell[BoxData[
- RowBox[{"TexPrint", "@", "%"}]], "Input"],
+ RowBox[{"TexPrint", "@", "expr2"}]], "Input"],
 
 Cell[BoxData["\<\"\\\\tfrac{1}{24} T_{abcd} -  \\\\tfrac{1}{24} T_{abdc} -  \
 \\\\tfrac{1}{24} T_{acbd} + \\\\tfrac{1}{24} T_{acdb} + \\\\tfrac{1}{24} \
@@ -8676,19 +9136,19 @@ Cell[BoxData["\<\"\\\\begin{align}\\n\\\\Sigma_{ab} \
 \\\\Sigma_{cd}={}&\\\\tfrac{1}{24} T_{abcd}\\n -  \\\\tfrac{1}{24} \
 T_{abdc}\\n -  \\\\tfrac{1}{24} T_{acbd}\\n + \\\\tfrac{1}{24} T_{acdb}\\n + \
 \\\\tfrac{1}{24} T_{adbc}\\n -  \\\\tfrac{1}{24} T_{adcb}\\n + \
-\\\\tfrac{1}{24} T_{cabd}\\n -  \\\\tfrac{1}{24} T_{cadb}\\\\nonumber\\\\\\\\\
-\\n& -  \\\\tfrac{1}{24} T_{cbad}\\n + \\\\tfrac{1}{24} T_{cbda}\\n + \
+\\\\tfrac{1}{24} T_{cabd}\\\\nonumber\\\\\\\\\\n& -  \\\\tfrac{1}{24} \
+T_{cadb}\\n -  \\\\tfrac{1}{24} T_{cbad}\\n + \\\\tfrac{1}{24} T_{cbda}\\n + \
 \\\\tfrac{1}{24} T_{cdab}\\n -  \\\\tfrac{1}{24} T_{cdba}\\n -  \
-\\\\tfrac{1}{24} T_{dabc}\\n + \\\\tfrac{1}{24} T_{dacb}\\n + \
-\\\\tfrac{1}{24} T_{dbac}\\n -  \\\\tfrac{1}{24} T_{dbca}\\\\nonumber\\\\\\\\\
-\\n& -  \\\\tfrac{1}{24} T_{dcab}\\n + \\\\tfrac{1}{24} T_{dcba}\\n -  \
-\\\\tfrac{1}{24} T_{b}{}^{e}{}_{cd} \\\\Sigma_{af} \\\\Sigma^{f}{}_{e}\\n + \
-\\\\tfrac{1}{24} T_{b}{}^{e}{}_{dc} \\\\Sigma_{af} \\\\Sigma^{f}{}_{e}\\n + \
-\\\\tfrac{1}{24} T_{b}{}^{e}{}_{ad} \\\\Sigma_{cf} \
-\\\\Sigma^{f}{}_{e}\\\\nonumber\\\\\\\\\\n& -  \\\\tfrac{1}{24} \
-T_{b}{}^{e}{}_{da} \\\\Sigma_{cf} \\\\Sigma^{f}{}_{e}\\n -  \\\\tfrac{1}{24} \
-T_{b}{}^{e}{}_{ac} \\\\Sigma_{df} \\\\Sigma^{f}{}_{e}\\n + \\\\tfrac{1}{24} \
-T_{b}{}^{e}{}_{ca} \\\\Sigma_{df} \
+\\\\tfrac{1}{24} T_{dabc}\\\\nonumber\\\\\\\\\\n& + \\\\tfrac{1}{24} T_{dacb}\
+\\n + \\\\tfrac{1}{24} T_{dbac}\\n -  \\\\tfrac{1}{24} T_{dbca}\\n -  \
+\\\\tfrac{1}{24} T_{dcab}\\n + \\\\tfrac{1}{24} \
+T_{dcba}\\\\nonumber\\\\\\\\\\n& -  \\\\tfrac{1}{24} T_{b}{}^{e}{}_{cd} \
+\\\\Sigma_{af} \\\\Sigma^{f}{}_{e}\\n + \\\\tfrac{1}{24} T_{b}{}^{e}{}_{dc} \
+\\\\Sigma_{af} \\\\Sigma^{f}{}_{e}\\n + \\\\tfrac{1}{24} T_{b}{}^{e}{}_{ad} \
+\\\\Sigma_{cf} \\\\Sigma^{f}{}_{e}\\\\nonumber\\\\\\\\\\n& -  \
+\\\\tfrac{1}{24} T_{b}{}^{e}{}_{da} \\\\Sigma_{cf} \\\\Sigma^{f}{}_{e}\\n -  \
+\\\\tfrac{1}{24} T_{b}{}^{e}{}_{ac} \\\\Sigma_{df} \\\\Sigma^{f}{}_{e}\\n + \
+\\\\tfrac{1}{24} T_{b}{}^{e}{}_{ca} \\\\Sigma_{df} \
 \\\\Sigma^{f}{}_{e}.\\n\\\\end{align}\"\>"], "Output"]
 }, Open  ]],
 
@@ -8768,7 +9228,7 @@ Cell[BoxData[
 },
 AutoGeneratedPackage->Automatic,
 WindowSize->{1005, 604},
-WindowMargins->{{Automatic, 37}, {-10, Automatic}},
+WindowMargins->{{Automatic, 85}, {7, Automatic}},
 PrivateNotebookOptions->{"FileOutlineCache"->False},
 ShowSelection->True,
 FrontEndVersion->"9.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (January 25, \

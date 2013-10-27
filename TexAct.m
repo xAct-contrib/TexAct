@@ -19,7 +19,7 @@
 
 
 
-xAct`TexAct`$Version={"0.3.3",{2013,9,16}};
+xAct`TexAct`$Version={"0.3.3",{2013,10,24}};
 xAct`TexAct`$xTensorVersionExpected={"1.0.5",{2013,1,30}};
 
 
@@ -124,9 +124,9 @@ TexPrintAlignedEquations::usage ="TexPrintAlignedEquations takes a list of equat
 $TexPrintPageWidth::usage = "Parameter to adjust the line breaking for TexPrintAlignedEquations. This is measured in printer points. Observe that you can use the textwidth variable which is read from the latex environment.";
 latextextwidth::usage="A symbol representing the textwidth variable in the current latex environment.";
 FormatTexBasis::usage ="FormatTexBasis works the same way as FormatBasis, but for the Tex output.";
-EquationMarks::usage ="An option for TexBreak to include \\begin{equation} \\end{equation} or similar constructions. Default is False, but a standard value would be equation as a string. Warning, do not use this on TexPrint if the result is passed to TexBreak.";
+EquationMarks::usage ="An option for TexBreak to include \\begin{equation} \\end{equation} or similar constructions. Default is False, but a standard value would be \"equation\". Warning, do not use this on TexPrint if the result is passed to TexBreak.";
 AddEquationMarks::usage="Adds \\begin{equation} \\end{equation} or similar constructions to a tex string. The default is Automatic which makes an educated guess.";
-TexView::usage="Compile and view tex output.";
+TexView::usage="TexView is used to compile and view tex output. The first argument can be a tex string, a list of equations, a single equation or expression. A second optional argument can be given to set the file name without extension. The compiler is set by $LatexExecutable. The file extension of the file to view is set by $TexViewExt.";
 $LatexExecutable::usage ="Command for compiling LaTeX. The default is pdflatex. Add the path to the file if the default value does not work.";
 $TexViewExt::usage = "The file extension for output file to view. The defailt is .pdf. If you want to open the .tex file in your default editor use .tex instead. Observe however that TexView overwrites files without asking so editing this file might not be a good idea.";
 TexPrintAlignedExpressions::usage="Takes a list of expressions, and typesets them in an aligned environment.";
@@ -418,6 +418,9 @@ TexPrint[expr_,initlevel_:Automatic]:=TexFix@TexParenthesis[ScreenDollarIndices[
 
 
 TexMatrix[M_?MatrixQ,F_: Tex]:=Module[{rows=Length[M],cols=Length@First@M},StringJoin["\\left(\\begin{array}{",StringJoin@@ConstantArray["c",{cols}],"}\n",StringJoin[Riffle[StringJoin[Riffle[F/@#," & "]]&/@M,"\\\\\n"]],"\n\\end{array}\\right)"]]
+
+
+Tex[Hold[expr_]]:=StringJoin[TexOpen["("],Tex[expr],TexClose[")"]];
 
 
 Tex[xAct`SymManipulator`SymH[headlist_,sym_,label_]?xTensorQ[inds___]]:=TexSymH[xAct`SymManipulator`SymH[headlist,sym,label][inds]]
@@ -732,7 +735,7 @@ Module[{outfile=OpenWrite[file]},
 WriteString[outfile,TexInitLatexCode[]];
 WriteString[outfile,"\\begin{document}\n"];
 WriteString[outfile,str];
-WriteString[outfile,"\\immediate\\write0{TexActFinished}
+WriteString[outfile,"\n\\immediate\\write0{TexActFinished}
 \\end{document}"];
 Close[outfile];];
 
@@ -758,10 +761,10 @@ Throw["Tex Error"]
 ];
 
 
-TexView[eqlist:{eq_Equal,eqs___ }]:=TexView@TexPrintAlignedEquations[eqlist]
-TexView[list_List]:=TexView@TexPrintAlignedExpressions[list]
-TexView[eq_Equal]:=TexView@TexPrintAlignedEquations[eq]
-TexView[expr_]:=TexView@AddEquationMarks[TexPrint[expr],Automatic]
+TexView[eqlist:{eq_Equal,eqs___ },opt___]:=TexView[TexPrintAlignedEquations[eqlist],opt]
+TexView[list_List,opt___]:=TexView[TexPrintAlignedExpressions[list],opt]
+TexView[eq_Equal,opt___]:=TexView[TexPrintAlignedEquations[eq],opt]
+TexView[expr_,opt___]:=TexView[AddEquationMarks[TexPrint[expr],Automatic],opt]
 
 
 End[]

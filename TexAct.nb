@@ -56,7 +56,7 @@ Cell[BoxData[
 
 Cell[BoxData[
  RowBox[{"{", 
-  RowBox[{"2013", ",", "9", ",", "16", ",", "15", ",", "18", ",", "30"}], 
+  RowBox[{"2013", ",", "10", ",", "24", ",", "10", ",", "51", ",", "1"}], 
   "}"}]], "Output"]
 }, Open  ]],
 
@@ -66,7 +66,7 @@ Cell[BoxData[{
    RowBox[{"{", 
     RowBox[{"\"\<0.3.3\>\"", ",", 
      RowBox[{"{", 
-      RowBox[{"2013", ",", "9", ",", "16"}], "}"}]}], "}"}]}], ";"}], "\n", 
+      RowBox[{"2013", ",", "10", ",", "24"}], "}"}]}], "}"}]}], ";"}], "\n", 
  RowBox[{
   RowBox[{"xAct`TexAct`$xTensorVersionExpected", "=", "\[NoBreak]", 
    RowBox[{"{", 
@@ -600,8 +600,8 @@ output.\>\""}], ";"}], "\[IndentingNewLine]",
    RowBox[{"EquationMarks", "::", "usage"}], " ", "=", 
    "\"\<An option for TexBreak to include \\\\begin{equation} \
 \\\\end{equation} or similar constructions. Default is False, but a standard \
-value would be equation as a string. Warning, do not use this on TexPrint if \
-the result is passed to TexBreak.\>\""}], ";"}], "\[IndentingNewLine]", 
+value would be \\\"equation\\\". Warning, do not use this on TexPrint if the \
+result is passed to TexBreak.\>\""}], ";"}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{
    RowBox[{"AddEquationMarks", "::", "usage"}], "=", 
@@ -611,7 +611,11 @@ guess.\>\""}], ";"}], "\[IndentingNewLine]",
  RowBox[{
   RowBox[{
    RowBox[{"TexView", "::", "usage"}], "=", 
-   "\"\<Compile and view tex output.\>\""}], ";"}], "\[IndentingNewLine]", 
+   "\"\<TexView is used to compile and view tex output. The first argument \
+can be a tex string, a list of equations, a single equation or expression. A \
+second optional argument can be given to set the file name without extension. \
+The compiler is set by $LatexExecutable. The file extension of the file to \
+view is set by $TexViewExt.\>\""}], ";"}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{
    RowBox[{"$LatexExecutable", "::", "usage"}], " ", "=", 
@@ -2591,6 +2595,29 @@ Cell[BoxData[
            "&"}], "/@", "M"}], ",", "\"\<\\\\\\\\\\n\>\""}], "]"}], "]"}], 
       ",", "\"\<\\n\\\\end{array}\\\\right)\>\""}], "]"}]}], "]"}]}]], "Input",
  InitializationCell->True]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["3.19. Hold", "Subsection"],
+
+Cell["\<\
+Hold can be used to stop a derivative to use the Leibniz rule, and it can \
+also stop other automatic rules to be applied. Therefore, it might be a \
+useful tool for typesetting too. We just typeset it as a parentesis.\
+\>", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"Tex", "[", 
+    RowBox[{"Hold", "[", "expr_", "]"}], "]"}], ":=", 
+   RowBox[{"StringJoin", "[", 
+    RowBox[{
+     RowBox[{"TexOpen", "[", "\"\<(\>\"", "]"}], ",", 
+     RowBox[{"Tex", "[", "expr", "]"}], ",", 
+     RowBox[{"TexClose", "[", "\"\<)\>\"", "]"}]}], "]"}]}], ";"}]], "Input",
+ InitializationCell->True]
 }, Closed]]
 }, Open  ]],
 
@@ -4311,7 +4338,7 @@ Cell[BoxData[
       RowBox[{"WriteString", "[", 
        RowBox[{
        "outfile", ",", 
-        "\"\<\\\\immediate\\\\write0{TexActFinished}\n\
+        "\"\<\\n\\\\immediate\\\\write0{TexActFinished}\n\
 \\\\end{document}\>\""}], "]"}], ";", "\[IndentingNewLine]", 
       RowBox[{"Close", "[", "outfile", "]"}], ";"}]}], "]"}]}], 
   ";"}]], "Input",
@@ -4408,33 +4435,40 @@ Cell[BoxData[
 Cell[BoxData[{
  RowBox[{
   RowBox[{"TexView", "[", 
-   RowBox[{"eqlist", ":", 
-    RowBox[{"{", 
-     RowBox[{"eq_Equal", ",", "eqs___"}], " ", "}"}]}], "]"}], ":=", 
-  RowBox[{"TexView", "@", 
    RowBox[{
-   "TexPrintAlignedEquations", "[", "eqlist", 
-    "]"}]}]}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{"TexView", "[", "list_List", "]"}], ":=", 
-  RowBox[{"TexView", "@", 
+    RowBox[{"eqlist", ":", 
+     RowBox[{"{", 
+      RowBox[{"eq_Equal", ",", "eqs___"}], " ", "}"}]}], ",", "opt___"}], 
+   "]"}], ":=", 
+  RowBox[{"TexView", "[", 
    RowBox[{
-   "TexPrintAlignedExpressions", "[", "list", 
-    "]"}]}]}], "\[IndentingNewLine]", 
+    RowBox[{"TexPrintAlignedEquations", "[", "eqlist", "]"}], ",", "opt"}], 
+   "]"}]}], "\[IndentingNewLine]", 
  RowBox[{
-  RowBox[{"TexView", "[", "eq_Equal", "]"}], ":=", 
-  RowBox[{"TexView", "@", 
+  RowBox[{"TexView", "[", 
+   RowBox[{"list_List", ",", "opt___"}], "]"}], ":=", 
+  RowBox[{"TexView", "[", 
    RowBox[{
-   "TexPrintAlignedEquations", "[", "eq", "]"}]}]}], "\[IndentingNewLine]", 
+    RowBox[{"TexPrintAlignedExpressions", "[", "list", "]"}], ",", "opt"}], 
+   "]"}]}], "\[IndentingNewLine]", 
  RowBox[{
-  RowBox[{"TexView", "[", "expr_", "]"}], ":=", 
-  RowBox[{"TexView", "@", 
-   RowBox[{"AddEquationMarks", "[", 
-    RowBox[{
-     RowBox[{"TexPrint", "[", "expr", "]"}], ",", "Automatic"}], 
-    "]"}]}]}]}], "Input",
+  RowBox[{"TexView", "[", 
+   RowBox[{"eq_Equal", ",", "opt___"}], "]"}], ":=", 
+  RowBox[{"TexView", "[", 
+   RowBox[{
+    RowBox[{"TexPrintAlignedEquations", "[", "eq", "]"}], ",", "opt"}], 
+   "]"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"TexView", "[", 
+   RowBox[{"expr_", ",", "opt___"}], "]"}], ":=", 
+  RowBox[{"TexView", "[", 
+   RowBox[{
+    RowBox[{"AddEquationMarks", "[", 
+     RowBox[{
+      RowBox[{"TexPrint", "[", "expr", "]"}], ",", "Automatic"}], "]"}], ",", 
+    "opt"}], "]"}]}]}], "Input",
  InitializationCell->True]
-}, Closed]]
+}, Open  ]]
 }, Open  ]],
 
 Cell[CellGroupData[{

@@ -31,4 +31,6 @@
 
 13 September - Added TexView.
 
-16 September - Improved TexView, introduced TexPrintAlignedExpressions and made it possible to use latextextwidth for automatic line breaking parameters.
+16 September - Improved TexView, introduced TexPrintAlignedExpressions and made it possible to use latextextwidth for line breaking parameters.
+
+24 October - Added handling of Hold expressions.

@@ -34,3 +34,5 @@
 16 September - Improved TexView, introduced TexPrintAlignedExpressions and made it possible to use latextextwidth for line breaking parameters.
 
 24 October - Added handling of Hold expressions.
+
+7 December - Added Factorials, Pochhammer symbols and Binomials.

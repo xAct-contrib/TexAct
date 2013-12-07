@@ -19,7 +19,7 @@
 
 
 
-xAct`TexAct`$Version={"0.3.3",{2013,10,24}};
+xAct`TexAct`$Version={"0.3.3",{2013,12,07}};
 xAct`TexAct`$xTensorVersionExpected={"1.0.5",{2013,1,30}};
 
 
@@ -365,6 +365,14 @@ withrespectto[var_,n_]:="\\partial "<>Tex[var]<>"^{"<>Tex[n]<>"}";
 Tex[Derivative[ders__][f_?ScalarFunctionQ][vars__]]:="\\frac{"<>deriv[f[vars],Plus[ders]]<>"}{"<>withrespectto[{vars},{ders}]<>"}";
 
 
+Tex[Factorial[n_Symbol]]:=StringJoin[Tex[n],"!"]
+Tex[Factorial[n_]]:=StringJoin[TexOpen["("],Tex[n],TexClose[")"],"!"]
+Tex[Factorial2[n_Symbol]]:=StringJoin[Tex[n],"!!"]
+Tex[Factorial2[n_]]:=StringJoin[TexOpen["("],Tex[n],TexClose[")"],"!!"]
+Tex[Pochhammer[n_,k_]]:=StringJoin[TexOpen["("],Tex[n],TexClose[")"],"_{",Tex[k],"}"]
+Tex[Binomial[n_,k_]]:=StringJoin["\\binom{",Tex[n],"}{",Tex[k],"}"]
+
+
 (* Other scalar functions *)
 Tex[f_?ScalarFunctionQ[args__]]:=StringJoin[Tex[f],TexOpen["("],Sequence@@InsertComma[Tex/@{args}],TexClose[")"]];
 InsertComma[arguments_List]:=Insert[arguments,", ",List/@Range[2,Length[arguments]]];
@@ -404,6 +412,22 @@ Tex[ParamD[ps__][expr_]]:=Apply[StringJoin,TexParamD/@Split@Sort[ps]]<>TexOpen["
 
 (* Equal *)
 Tex[Equal[lhs_,rhs_]]:=StringJoin[Tex[lhs]," = ",Tex[rhs]];
+
+
+(* Less *)
+Tex[Less[lhs_,rhs_]]:=StringJoin[Tex[lhs]," < ",Tex[rhs]];
+
+
+(* LessEqual *)
+Tex[LessEqual[lhs_,rhs_]]:=StringJoin[Tex[lhs]," \\leq ",Tex[rhs]];
+
+
+(* Less *)
+Tex[Greater[lhs_,rhs_]]:=StringJoin[Tex[lhs]," > ",Tex[rhs]];
+
+
+(* LessEqual *)
+Tex[GreaterEqual[lhs_,rhs_]]:=StringJoin[Tex[lhs]," \\geq ",Tex[rhs]];
 
 
 $TexFixExtraRules={};

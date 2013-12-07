@@ -66,7 +66,7 @@ Cell[BoxData[{
    RowBox[{"{", 
     RowBox[{"\"\<0.3.3\>\"", ",", 
      RowBox[{"{", 
-      RowBox[{"2013", ",", "10", ",", "24"}], "}"}]}], "}"}]}], ";"}], "\n", 
+      RowBox[{"2013", ",", "12", ",", "07"}], "}"}]}], "}"}]}], ";"}], "\n", 
  RowBox[{
   RowBox[{"xAct`TexAct`$xTensorVersionExpected", "=", "\[NoBreak]", 
    RowBox[{"{", 
@@ -2204,6 +2204,60 @@ Cell[BoxData[
     ";"}]}]}]], "Input",
  InitializationCell->True],
 
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"Tex", "[", 
+   RowBox[{"Factorial", "[", "n_Symbol", "]"}], "]"}], ":=", 
+  RowBox[{"StringJoin", "[", 
+   RowBox[{
+    RowBox[{"Tex", "[", "n", "]"}], ",", "\"\<!\>\""}], 
+   "]"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Tex", "[", 
+   RowBox[{"Factorial", "[", "n_", "]"}], "]"}], ":=", 
+  RowBox[{"StringJoin", "[", 
+   RowBox[{
+    RowBox[{"TexOpen", "[", "\"\<(\>\"", "]"}], ",", 
+    RowBox[{"Tex", "[", "n", "]"}], ",", 
+    RowBox[{"TexClose", "[", "\"\<)\>\"", "]"}], ",", "\"\<!\>\""}], 
+   "]"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Tex", "[", 
+   RowBox[{"Factorial2", "[", "n_Symbol", "]"}], "]"}], ":=", 
+  RowBox[{"StringJoin", "[", 
+   RowBox[{
+    RowBox[{"Tex", "[", "n", "]"}], ",", "\"\<!!\>\""}], 
+   "]"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Tex", "[", 
+   RowBox[{"Factorial2", "[", "n_", "]"}], "]"}], ":=", 
+  RowBox[{"StringJoin", "[", 
+   RowBox[{
+    RowBox[{"TexOpen", "[", "\"\<(\>\"", "]"}], ",", 
+    RowBox[{"Tex", "[", "n", "]"}], ",", 
+    RowBox[{"TexClose", "[", "\"\<)\>\"", "]"}], ",", "\"\<!!\>\""}], 
+   "]"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Tex", "[", 
+   RowBox[{"Pochhammer", "[", 
+    RowBox[{"n_", ",", "k_"}], "]"}], "]"}], ":=", 
+  RowBox[{"StringJoin", "[", 
+   RowBox[{
+    RowBox[{"TexOpen", "[", "\"\<(\>\"", "]"}], ",", 
+    RowBox[{"Tex", "[", "n", "]"}], ",", 
+    RowBox[{"TexClose", "[", "\"\<)\>\"", "]"}], ",", "\"\<_{\>\"", ",", 
+    RowBox[{"Tex", "[", "k", "]"}], ",", "\"\<}\>\""}], 
+   "]"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Tex", "[", 
+   RowBox[{"Binomial", "[", 
+    RowBox[{"n_", ",", "k_"}], "]"}], "]"}], ":=", 
+  RowBox[{"StringJoin", "[", 
+   RowBox[{"\"\<\\\\binom{\>\"", ",", 
+    RowBox[{"Tex", "[", "n", "]"}], ",", "\"\<}{\>\"", ",", 
+    RowBox[{"Tex", "[", "k", "]"}], ",", "\"\<}\>\""}], "]"}]}]}], "Input",
+ InitializationCell->True],
+
 Cell[BoxData[
  RowBox[{
   RowBox[{"(*", " ", 
@@ -2484,7 +2538,7 @@ Cell[BoxData[
 
 Cell[CellGroupData[{
 
-Cell["3.16. Equal", "Subsection"],
+Cell["3.16. Equalities and inequalities", "Subsection"],
 
 Cell[BoxData[
  RowBox[{
@@ -2497,6 +2551,62 @@ Cell[BoxData[
     RowBox[{"StringJoin", "[", 
      RowBox[{
       RowBox[{"Tex", "[", "lhs", "]"}], ",", "\"\< = \>\"", ",", 
+      RowBox[{"Tex", "[", "rhs", "]"}]}], "]"}]}], ";"}]}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", "Less", " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"Tex", "[", 
+     RowBox[{"Less", "[", 
+      RowBox[{"lhs_", ",", "rhs_"}], "]"}], "]"}], ":=", 
+    RowBox[{"StringJoin", "[", 
+     RowBox[{
+      RowBox[{"Tex", "[", "lhs", "]"}], ",", "\"\< < \>\"", ",", 
+      RowBox[{"Tex", "[", "rhs", "]"}]}], "]"}]}], ";"}]}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", "LessEqual", " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"Tex", "[", 
+     RowBox[{"LessEqual", "[", 
+      RowBox[{"lhs_", ",", "rhs_"}], "]"}], "]"}], ":=", 
+    RowBox[{"StringJoin", "[", 
+     RowBox[{
+      RowBox[{"Tex", "[", "lhs", "]"}], ",", "\"\< \\\\leq \>\"", ",", 
+      RowBox[{"Tex", "[", "rhs", "]"}]}], "]"}]}], ";"}]}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", "Less", " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"Tex", "[", 
+     RowBox[{"Greater", "[", 
+      RowBox[{"lhs_", ",", "rhs_"}], "]"}], "]"}], ":=", 
+    RowBox[{"StringJoin", "[", 
+     RowBox[{
+      RowBox[{"Tex", "[", "lhs", "]"}], ",", "\"\< > \>\"", ",", 
+      RowBox[{"Tex", "[", "rhs", "]"}]}], "]"}]}], ";"}]}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", "LessEqual", " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"Tex", "[", 
+     RowBox[{"GreaterEqual", "[", 
+      RowBox[{"lhs_", ",", "rhs_"}], "]"}], "]"}], ":=", 
+    RowBox[{"StringJoin", "[", 
+     RowBox[{
+      RowBox[{"Tex", "[", "lhs", "]"}], ",", "\"\< \\\\geq \>\"", ",", 
       RowBox[{"Tex", "[", "rhs", "]"}]}], "]"}]}], ";"}]}]], "Input",
  InitializationCell->True]
 }, Closed]],
@@ -4468,7 +4578,7 @@ Cell[BoxData[{
       RowBox[{"TexPrint", "[", "expr", "]"}], ",", "Automatic"}], "]"}], ",", 
     "opt"}], "]"}]}]}], "Input",
  InitializationCell->True]
-}, Open  ]]
+}, Closed]]
 }, Open  ]],
 
 Cell[CellGroupData[{

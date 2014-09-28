@@ -19,8 +19,8 @@
 
 
 
-xAct`TexAct`$Version={"0.3.3",{2013,12,07}};
-xAct`TexAct`$xTensorVersionExpected={"1.0.5",{2013,1,30}};
+xAct`TexAct`$Version={"0.3.5",{2014,9,24}};
+xAct`TexAct`$xTensorVersionExpected={"1.1.0",{2013,9,1}};
 
 
 (* TexAct, Tex code to format xAct expressions *)
@@ -127,12 +127,23 @@ FormatTexBasis::usage ="FormatTexBasis works the same way as FormatBasis, but fo
 EquationMarks::usage ="An option for TexBreak to include \\begin{equation} \\end{equation} or similar constructions. Default is False, but a standard value would be \"equation\". Warning, do not use this on TexPrint if the result is passed to TexBreak.";
 AddEquationMarks::usage="Adds \\begin{equation} \\end{equation} or similar constructions to a tex string. The default is Automatic which makes an educated guess.";
 TexView::usage="TexView is used to compile and view tex output. The first argument can be a tex string, a list of equations, a single equation or expression. A second optional argument can be given to set the file name without extension. The compiler is set by $LatexExecutable. The file extension of the file to view is set by $TexViewExt.";
+TexPort::usage="Does the same thing as TexView, but it does not open the file. A file name must be given as a second argument.";
 $LatexExecutable::usage ="Command for compiling LaTeX. The default is pdflatex. Add the path to the file if the default value does not work.";
 $TexViewExt::usage = "The file extension for output file to view. The defailt is .pdf. If you want to open the .tex file in your default editor use .tex instead. Observe however that TexView overwrites files without asking so editing this file might not be a good idea.";
 TexPrintAlignedExpressions::usage="Takes a list of expressions, and typesets them in an aligned environment.";
+EnableTexColor::usage="Enables the use of colors in the tex output.";
+DisableTexColor::usage="Disables the use of colors in the tex output.";
+ParenthesisOldStyle::usage="ParenthesisOldStyle can be given as a second argument to TexPrint to recover the old style of counting parenthesis levels.";
 
 
 Begin["`Private`"]
+
+
+$TexParenthesisNewstyle=False;
+
+
+$TexOpenParChar=FromCharacterCode[23];
+$TexCloseParChar=FromCharacterCode[25];
 
 
 TexOpen[string_String]:=OpenParenthesis[Decrement[level]]<>string;
@@ -140,8 +151,11 @@ TexClose[string_String]:=CloseParenthesis[PreIncrement[level]]<>string;
 
 
 (* Trick to count maximum depth *)
-OpenParenthesis[level_Integer?Negative]:=(minlevel=Min[minlevel,level];"");
-CloseParenthesis[level_Integer?Negative]:="";
+OpenParenthesis[level_Integer?Negative]:=If[$TexParenthesisNewstyle,$TexOpenParChar,
+(minlevel=Min[minlevel,level];"")];
+CloseParenthesis[level_Integer?Negative]:=If[$TexParenthesisNewstyle,$TexCloseParChar,
+""];
+
 
 OpenParenthesis[0]:="";
 CloseParenthesis[0]:="";
@@ -172,8 +186,40 @@ minlevel=0;
 
 
 $VerboseParenthesizationLevel=False;
-TexParenthesis[expr_,initlevel_:Automatic]:=Block[{level=If[initlevel===Automatic,TexMaximumLevel[expr],initlevel]},If[$VerboseParenthesationLevel,Print["Maximum parenthesization level: ",level]];
+TexParenthesis[expr_,initlevel_:Automatic]:=
+If[initlevel===Automatic,
+Block[{level=-1,$TexParenthesisNewstyle=True},
+PlaceParenthesis@Tex[expr]],
+Block[{level=If[initlevel===ParenthesisOldStyle,TexMaximumLevel[expr],initlevel]},If[$VerboseParenthesationLevel,Print["Maximum parenthesization level: ",level]];
 Tex[expr]
+]];
+
+
+PlaceParenthesis[texinstr_String]:=Module[{parchars=StringCases[texinstr,Alternatives[$TexOpenParChar,$TexCloseParChar]],substrings,texstring="",i=1,j,parlevel, maxparlevel},
+substrings=StringSplit[texinstr,Alternatives[$TexOpenParChar,$TexCloseParChar],All];
+While[Length@substrings>0,texstring=StringJoin[texstring,First@substrings];
+substrings=Rest@substrings;
+If[i<= Length@parchars&&parchars[[i]]===$TexOpenParChar,
+j=i+1;
+parlevel=1;
+maxparlevel=1;
+While[j<= Length@parchars&&parlevel>0,
+If[parchars[[j]]===$TexOpenParChar,maxparlevel=Max[maxparlevel,++parlevel],parlevel--];
+j++];
+texstring=StringJoin[texstring,OpenParenthesis[maxparlevel-1]];
+];
+If[i<= Length@parchars&&parchars[[i]]===$TexCloseParChar,
+j=i-1;
+parlevel=1;
+maxparlevel=1;
+While[j>= 1&&parlevel>0,
+If[parchars[[j]]===$TexCloseParChar,maxparlevel=Max[maxparlevel,++parlevel],parlevel--];
+j--];
+texstring=StringJoin[texstring,CloseParenthesis[maxparlevel-1]];
+];
+i++;
+];
+texstring
 ];
 
 
@@ -222,6 +268,9 @@ RemoveStyleBoxes[string_String]:=StringReplace[string,StringExpression["\!\(\*St
 Tex[string_String]:=Removetext@ToString@TeXForm@RemoveStyleBoxes@string;
 
 
+Tex[TexString[string_String]]:=string;
+
+
 Tex["\[Eth]"]="\\eth"
 
 
@@ -232,6 +281,15 @@ Tex[Sec]:="\\sec";
 Tex[Csc]:="\\csc";
 Tex[Cot]:="\\cot";
 Tex[Tan]:="\\tan";
+Tex[Log]:="\\log";
+Tex[Sinh]:="\\sinh";
+Tex[Cosh]:="\\cosh";
+Tex[Tanh]:="\\tanh";
+
+
+$TexTrigFuncs={Sin,Cos,Tan,Cot,Sec,Csc,Sinh,Cosh,Tanh};
+Tex[(trig:Alternatives@@$TexTrigFuncs)[T_?xTensorQ[]]]:=StringReplace[StringJoin[Tex[trig]," ",Tex[T]]," \\"->"\\"];
+Tex[Power[(trig:Alternatives@@$TexTrigFuncs)[T_?xTensorQ[]],i_Integer]]:=StringJoin[Tex[trig],"^",Tex[i],Tex[T]]/;And[i>1,i<10];
 
 
 (* Symbols (including constant-symbols and parameters) *)
@@ -267,9 +325,13 @@ TexCovDIndices[post_][first_?UpIndexQ,more___]:=StringJoin["{}^{",post,TexUpInde
 TexCovDIndices[post_][first_?DownIndexQ,more___]:=StringJoin["{}_{",post,TexUpIndex[ChangeIndex@first],TexIndicesFromDown[more],"}"];
 
 
+OrderedPlus[0,terms__]:=OrderedPlus[terms];
+OrderedPlus[terms1__,0,terms2___]:=OrderedPlus[terms1,terms2];
+
+
 (* Unary minus *)
 TexOperator[Minus]="- ";
-Tex[-expr_Plus]:=StringJoin[TexOperator[Minus],TexOpen["("],Tex[expr],TexClose[")"]];
+Tex[(-expr_Plus|-expr_OrderedPlus)]:=StringJoin[TexOperator[Minus],TexOpen["("],Tex[expr],TexClose[")"]];
 Tex[-expr_]:=TexOperator[Minus]<>Tex[expr];
 
 
@@ -277,7 +339,7 @@ Tex[-expr_]:=TexOperator[Minus]<>Tex[expr];
 TexOperator[Times]:=" ";
 TexFactor[1]:="";
 TexFactor[-1]:=TexOperator[Minus];
-TexFactor[expr_Plus]:=StringJoin[TexOpen["("],Tex[expr],TexClose[")"]];
+TexFactor[(expr_Plus|expr_OrderedPlus)]:=StringJoin[TexOpen["("],Tex[expr],TexClose[")"]];
 TexFactor[expr_]:=Tex[expr];
 TexOrdinaryTimes[expr_Times]:=StringJoin@@Riffle[TexFactor/@List@@expr,TexOperator[Times]];
 TexOrdinaryTimes[expr_]:=Tex@expr;
@@ -296,7 +358,7 @@ TexOrdinaryTimes[expr]
 
 (* Sum *)
 TexOperator[Plus]:=" + ";
-Tex[expr_Plus]:=StringJoin@@Riffle[Tex/@List@@expr,TexOperator[Plus]];
+Tex[(expr_Plus|expr_OrderedPlus)]:=StringJoin@@Riffle[Tex/@List@@expr,TexOperator[Plus]];
 
 
 (* Square root of a number *)
@@ -330,6 +392,11 @@ TexExponent[x_]:=Block[{$TexSmallFraction=$TexSmallFractionExponent},With[{tex=T
 (*Tex[Power[x_,-1]]:=StringJoin["\\frac{1}{",Tex[x],"}"]/;ByteCount[x]<200;*)
 Tex[Power[x_,-1]]:=TexFracExpression[1,x,$TexFraction]/;$TexFractionAsFraction;
 Tex[Power[x_,n_]]:=StringJoin[TexBase[x],TexOperator[Power],TexExponent[n]];
+
+
+(* Abs *)
+Tex[Power[Abs[x_],n_]]:=StringJoin[TexOpen["|"],Tex[x],TexClose["|"],TexOperator[Power],TexExponent[n]];
+Tex[Abs[x_]]:=StringJoin[TexOpen["|"],Tex[x],TexClose["|"]];
 
 
 (* Basis *)
@@ -399,6 +466,10 @@ TexCovD[covd_]:=Tex/@SymbolOfCovD[covd];
 Tex[LieD[n_Symbol[_]][expr_]]:="\\mathcal{L}_"<>Tex[n]<>Tex[expr];
 
 
+(* Brackets *)
+Tex[Bracket[expr1_,expr2_]]:=StringJoin[TexOpen["["],Tex[expr1],", ", Tex[expr2],TexClose["]"]];
+
+
 (* Parametric derivative *)
 TexParamD[{ps_}]:="\\partial_"<>Tex[ps]<>" ";
 TexParamD[ps:{__}]:="\\partial_"<>Tex[First[ps]]<>"^{"<>ToString[Length[ps]]<>"} ";
@@ -411,23 +482,23 @@ Tex[ParamD[ps__][expr_]]:=Apply[StringJoin,TexParamD/@Split@Sort[ps]]<>TexOpen["
 
 
 (* Equal *)
-Tex[Equal[lhs_,rhs_]]:=StringJoin[Tex[lhs]," = ",Tex[rhs]];
+Tex[expr_Equal]:=StringJoin[Riffle[Tex/@List@@expr," = "]];
 
 
 (* Less *)
-Tex[Less[lhs_,rhs_]]:=StringJoin[Tex[lhs]," < ",Tex[rhs]];
+Tex[expr_Less]:=StringJoin[Riffle[Tex/@List@@expr," < "]];
 
 
 (* LessEqual *)
-Tex[LessEqual[lhs_,rhs_]]:=StringJoin[Tex[lhs]," \\leq ",Tex[rhs]];
+Tex[expr_LessEqual]:=StringJoin[Riffle[Tex/@List@@expr," \\leq "]];
 
 
 (* Less *)
-Tex[Greater[lhs_,rhs_]]:=StringJoin[Tex[lhs]," > ",Tex[rhs]];
+Tex[expr_Greater]:=StringJoin[Riffle[Tex/@List@@expr," > "]];
 
 
 (* LessEqual *)
-Tex[GreaterEqual[lhs_,rhs_]]:=StringJoin[Tex[lhs]," \\geq ",Tex[rhs]];
+Tex[expr_GreaterEqual]:=StringJoin[Riffle[Tex/@List@@expr," \\geq "]];
 
 
 $TexFixExtraRules={};
@@ -445,6 +516,12 @@ TexMatrix[M_?MatrixQ,F_: Tex]:=Module[{rows=Length[M],cols=Length@First@M},Strin
 
 
 Tex[Hold[expr_]]:=StringJoin[TexOpen["("],Tex[expr],TexClose[")"]];
+
+
+Tex[sd:HoldPattern[SeriesData[x_,DirectedInfinity[1],coefflist_List,nmin_,nmax_,den_]]]:=Tex[OrderedPlus@@Append[((coefflist[[#]]*x^(-(#-1+nmin)/den))&/@Range@Length@coefflist),TexString@StringJoin["\\mathcal{O}",TexOpen["("],Tex[(x)^(-nmax/den)],TexClose[")"]]]]
+
+
+Tex[sd:HoldPattern[SeriesData[x_,x0_,coefflist_List,nmin_,nmax_,den_]]]:=Tex[OrderedPlus@@Append[((coefflist[[#]]*OrderedPlus[x,-x0]^((#-1+nmin)/den))&/@Range@Length@coefflist),TexString@StringJoin["\\mathcal{O}",TexOpen["("],Tex[OrderedPlus[x,-x0]^(nmax/den)],TexClose[")"]]]]
 
 
 Tex[xAct`SymManipulator`SymH[headlist_,sym_,label_]?xTensorQ[inds___]]:=TexSymH[xAct`SymManipulator`SymH[headlist,sym,label][inds]]
@@ -469,11 +546,11 @@ If[Length@Select[orbitgroupsymbols,First[#]==="Unkown"&]>0,
 texfail=True;
 Print["Not a disjoint union of symmetric and antisymmetric groups."];];
 downindexslots=Select[Range[1,Length@indlist],DownIndexQ[indlist[[#]]]&];
-orbitondowninds=xAct`SymManipulator`Private`SubsetQ[#,downindexslots]&/@longorbits;
+orbitondowninds=xAct`SymManipulator`Private`subsetQ[#,downindexslots]&/@longorbits;
 orbitonupinds=Length[Intersection[#,downindexslots]]==0&/@longorbits;
 If[Not[And@@MapThread[Or,{orbitondowninds,orbitonupinds}]],
 texfail=True;
-Print["Not all indices are good positions."]];
+Print["Not all indices are in good positions."]];
 downsymorbits=Pick[longorbits,orbitondowninds];
 upsymorbits=Pick[longorbits,orbitonupinds];
 If[Not@And[OrderedQ[Join@@downsymorbits],OrderedQ[Join@@upsymorbits]],
@@ -538,6 +615,33 @@ fromdownQ,"}{}^{",
 DownIndexQ[index],"}{}_{",
 True,""];
 StringJoin[indexstring,preindexsymbol,TexUpIndex[UpIndex @index]]]
+
+
+(* Wedge *)
+TexOperator[Wedge]:=" \\wedge ";
+Tex[expr_Wedge]:=StringJoin@@Riffle[TexFactor/@List@@expr,TexOperator[Wedge]];
+
+
+(* Exterior derivative *)
+TexOperator[xAct`xTerior`Diff]:=" d ";
+Tex[HoldPattern[xAct`xTerior`Diff[expr_Wedge|expr_Plus|expr_Times,covd___]]]:=StringJoin[TexOperator[xAct`xTerior`Diff],If[covd===PD,"",StringJoin["^{",Tex[SymbolOfCovD[covd][[2]]],"}"]],TexOpen["("],Tex[expr],TexClose[")"]];
+Tex[HoldPattern[xAct`xTerior`Diff[expr_,covd___]]]:=StringJoin[TexOperator[xAct`xTerior`Diff],If[covd===PD,"",StringJoin["^{",Tex[SymbolOfCovD[covd][[2]]],"}"]],Tex[expr]];
+
+
+(* Coframe and dx *)
+Tex[xAct`xTerior`Coframe[man_]]:="\\theta";
+Tex[xAct`xTerior`dx[man_]]:="dx";
+
+
+Tex[xAct`xTerior`Hodge[met_]]:=StringJoin["{*}_{",Tex[met],"}"];
+Tex[xAct`xTerior`Hodge[met_][expr_Wedge|expr_Plus|expr_Times]]:=StringJoin[Tex[xAct`xTerior`Hodge[met]],TexOpen["("],Tex[expr],TexClose[")"]];Tex[xAct`xTerior`Hodge[met_][expr_]]:=StringJoin[Tex[xAct`xTerior`Hodge[met]],Tex[expr]];
+Tex[xAct`xTerior`Codiff[met_]]:=StringJoin["\\delta_{",Tex[met],"}"];
+Tex[xAct`xTerior`Codiff[met_][expr_Wedge|expr_Plus|expr_Times]]:=StringJoin[Tex[xAct`xTerior`Codiff[met]],TexOpen["("],Tex[expr],TexClose[")"]];
+Tex[xAct`xTerior`Codiff[met_][expr_]]:=StringJoin[Tex[xAct`xTerior`Codiff[met]],Tex[expr]];
+Tex[xAct`xTerior`CartanD[v_?xTensorQ[a_]][expr_Wedge|expr_Plus|expr_Times,covd_]]:=StringJoin["\\mathcal{L}",If[Or[Length@{covd}==0,covd===xAct`xTensor`PD],"",StringJoin["^{",Tex@Last@SymbolOfCovD[covd],"}{}"]],"_{",Tex[v],"}",TexOpen["("],Tex[expr],TexClose[")"]];
+Tex[xAct`xTerior`CartanD[v_?xTensorQ[a_]][expr_,covd___]]:=StringJoin["\\mathcal{L}",If[Or[Length@{covd}==0,covd===xAct`xTensor`PD],"",StringJoin["^{",Tex@Last@SymbolOfCovD[covd],"}{}"]],"_{",Tex[v],"}",Tex[expr]];
+Tex[HoldPattern[xAct`xTerior`Int[v_?xTensorQ[a_]][expr_]]]:=StringJoin["\\iota_{",Tex[v],"}",Tex[expr]];
+Tex[HoldPattern[form:(xAct`xTerior`ChristoffelForm|xAct`xTerior`ConnectionForm|xAct`xTerior`RiemannForm|xAct`xTerior`CurvatureForm|xAct`xTerior`TorsionForm)[covd_,vb___]]]:=Tex@PrintAs@form;
 
 
 Options[TexBreak]={TexBreakBy->"Character",TexBreakAt->" + "|" - ",TexBreakString->" \\nonumber \\\\ \n&&",EquationMarks->False};
@@ -668,8 +772,8 @@ TexWidthsWriteFile[strs___]:=
 Module[{tmpfile=OpenWrite["TexActWidthTest.tex"]},
 WriteString[tmpfile,TexInitLatexCode[]];
 WriteString[tmpfile,"\\newlength{\\widthofexpr}
-\\newcommand{\\testwidth}[1]{\\settowidth{\\widthofexpr}{\\hbox{${}#1$}}}
-\\newcommand{\\writewidth}[1]{\\settowidth{\\widthofexpr}{\\hbox{${}#1$}}
+\\newcommand{\\testwidth}[1]{\\settowidth{\\widthofexpr}{\\hbox{$\\displaystyle{}#1$}}}
+\\newcommand{\\writewidth}[1]{\\settowidth{\\widthofexpr}{\\hbox{$\\displaystyle{}#1$}}
 \\immediate\\write0{\\the\\widthofexpr}}
 \\begin{document}\n"];
 WriteString[tmpfile,StringJoin["\\testwidth{",#,"}\n"]]&/@{strs};WriteString[tmpfile,"\\immediate\\write0{xActWidthStart}\n"];
@@ -764,7 +868,7 @@ WriteString[outfile,"\n\\immediate\\write0{TexActFinished}
 Close[outfile];];
 
 
-TexView[texstr_String,file_String:"TexActView"]:=Module[{TexOut,errorpos},
+TexView[texstr_String,file_String:"TexActView",openfileq_:True]:=Module[{TexOut,errorpos},
 SetDirectory[$TexDirectory];
 TexWriteFile[texstr,StringJoin[file,".tex"]];
 TexOut=ReadList[StringJoin["!"<>$LatexExecutable<>" ",file,".tex"],String];
@@ -772,8 +876,10 @@ ResetDirectory[];
 If[Length@Position[TexOut,"TexActFinished",1,1]==1,
 SetDirectory[$TexDirectory];
 Print["Typesetting OK."];
+If[openfileq,
 Print["Opening file: ", file,$TexViewExt];
 SystemOpen[StringJoin[file,$TexViewExt]];
+];
 ResetDirectory[];,
 errorpos=Position[TexOut,str_String?(StringMatchQ[#,StartOfString ~~ "!"~~___]&)];
 If[Length@errorpos>0,
@@ -789,6 +895,27 @@ TexView[eqlist:{eq_Equal,eqs___ },opt___]:=TexView[TexPrintAlignedEquations[eqli
 TexView[list_List,opt___]:=TexView[TexPrintAlignedExpressions[list],opt]
 TexView[eq_Equal,opt___]:=TexView[TexPrintAlignedEquations[eq],opt]
 TexView[expr_,opt___]:=TexView[AddEquationMarks[TexPrint[expr],Automatic],opt]
+
+
+TexPort[expr_, file_String]:=TexView[expr,file,False];
+
+
+EnableTexColor[]:=(
+TexColor[str_,colrule_Rule]:=StringJoin["\\textcolor[rgb]",ToString[List@@(FontColor/.colrule)],"{",ToString[str],"}"];
+TexColor[str_,FontColor->RGBColor[1.`,0.`,0.`]]:=StringJoin["\\red{",ToString[str],"}"];
+TexColor[str_,FontColor->RGBColor[0.`,1.`,0.`]]:=StringJoin["\\green{",ToString[str],"}"];
+TexColor[str_,FontColor->RGBColor[0.`,0.`,1.`]]:=StringJoin["\\blue{",ToString[str],"}"];
+TexColor2[str_,colrule_Rule]:=TexColor[xAct`TexAct`Private`Removetext@ToString@TeXForm@xAct`TexAct`Private`RemoveStyleBoxes@str,colrule];
+Tex[string_String]:=If[StringMatchQ[string,"\!\(\*StyleBox["~~___~~"]\)"],TexColor2@@(ToExpression/@StringSplit[StringDrop[StringDrop[string,12],-2],",",2]),Removetext@ToString@TeXForm@RemoveStyleBoxes@string];
+$TexInitLatexPackages=DeleteDuplicates[Append[$TexInitLatexPackages,"{color}"]];
+$TexInitLatexExtraCode=DeleteDuplicates[Join[$TexInitLatexExtraCode,{"\\newcommand{\\red}[1]{\\textcolor{red}{#1}}","\\newcommand{\\green}[1]{\\textcolor{green}{#1}}","\\newcommand{\\blue}[1]{\\textcolor{blue}{#1}}"}]];
+);
+
+
+DisableTexColor[]:=(
+Tex[string_String]:=Removetext@ToString@TeXForm@RemoveStyleBoxes@string;$TexInitLatexPackages=DeleteCases[$TexInitLatexPackages,"{color}"];
+$TexInitLatexExtraCode=DeleteCases[$TexInitLatexExtraCode,Alternatives["\\newcommand{\\red}[1]{\\textcolor{red}{#1}}","\\newcommand{\\green}[1]{\\textcolor{green}{#1}}","\\newcommand{\\blue}[1]{\\textcolor{blue}{#1}}"]];
+);
 
 
 End[]

@@ -36,3 +36,24 @@
 24 October - Added handling of Hold expressions.
 
 7 December - Added Factorials, Pochhammer symbols and Binomials.
+
+7 December * Released with version 0.3.3
+
+--------------------
+2014
+
+23 March - Added support for SeriesData and Color support. Also inequalities and equalities with several terms are now possible.
+
+
+29 March  - Changed the way parenthesis levels are computed. This gives the correct behaviour and the code is passed through the Tex function only once. The old behaviour can still be used with TexPrint[expr,ParenthesisOldStyle].
+
+2 June - Added TexPort. It does the same things as TexView, but does not open the file.
+
+23 July - Fixed incompatibility for SubsetQ in Mathematica 10.
+
+7 August - Fixed problem with SeriesData when expanding at infinity. 
+- Tex widths where previously measured in inline mode, now it is done in display mode.
+
+7 September - Simplified output for functions in the private list $TrigFuncs, i.e. classical way of writing arguments and powers of functions.
+
+13-24 September - Support for xTerior.

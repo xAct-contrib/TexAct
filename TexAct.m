@@ -19,7 +19,7 @@
 
 
 
-xAct`TexAct`$Version={"0.3.5",{2014,9,24}};
+xAct`TexAct`$Version={"0.3.6",{2015,5,19}};
 xAct`TexAct`$xTensorVersionExpected={"1.1.0",{2013,9,1}};
 
 
@@ -463,7 +463,7 @@ TexCovD[covd_]:=Tex/@SymbolOfCovD[covd];
 
 
 (* Lie derivatives *)
-Tex[LieD[n_Symbol[_]][expr_]]:="\\mathcal{L}_"<>Tex[n]<>Tex[expr];
+Tex[LieD[n_Symbol[_]][expr_]]:="\\mathcal{L}_"<>Tex[n]<>" "<>Tex[expr];
 
 
 (* Brackets *)
@@ -512,7 +512,7 @@ TexFix[string_String]:=StringReplace[StringReplace[string,"$"->""],Join[{"+-"->"
 TexPrint[expr_,initlevel_:Automatic]:=TexFix@TexParenthesis[ScreenDollarIndices[expr],initlevel];
 
 
-TexMatrix[M_?MatrixQ,F_: Tex]:=Module[{rows=Length[M],cols=Length@First@M},StringJoin["\\left(\\begin{array}{",StringJoin@@ConstantArray["c",{cols}],"}\n",StringJoin[Riffle[StringJoin[Riffle[F/@#," & "]]&/@M,"\\\\\n"]],"\n\\end{array}\\right)"]]
+TexMatrix[M_?MatrixQ,F_: Tex]:=TexFix@Module[{rows=Length[M],cols=Length@First@M},StringJoin["\\left(\\begin{array}{",StringJoin@@ConstantArray["c",{cols}],"}\n",StringJoin[Riffle[StringJoin[Riffle[F/@#," & "]]&/@M,"\\\\\n"]],"\n\\end{array}\\right)"]]
 
 
 Tex[Hold[expr_]]:=StringJoin[TexOpen["("],Tex[expr],TexClose[")"]];
@@ -538,30 +538,27 @@ True,(* Everything else *)
 {"Unkown","Unkown"}];
 
 
-TexSymH[x:(xAct`SymManipulator`SymH[headlist_,sym_,label_][inds___])]:=Module[
-{texfail=False,n=Length@List[inds], indlist=List@inds, longorbits, orbitgroupsymbols,orbitondowninds,orbitonupinds, downsymorbits, upsymorbits, excludesymdowninds,excludesymupinds, downindexslots, beginsym, endsym, beginexclude, endexclude, preindexsymbolrules, postindexsymbolrules},
-longorbits=Sort/@Select[Orbits[sym,n],Length[#]>1&];
+TexSymH[x:(xAct`SymManipulator`SymH[headlist_,sym_,label_][inds___])]:=Module[{texfail=False,n=Length@List[inds],indlist=List@inds,longorbits,orbitgroupsymbols,orbitondowninds,orbitonupinds,downsymorbits,upsymorbits,excludesymdowninds,splitdowninds,splitupinds,downorbitranges,uporbitranges,excludesymupinds,downindexslots,beginsym,endsym,beginexclude,endexclude,preindexsymbolrules,postindexsymbolrules},longorbits=Sort/@Select[Orbits[sym,n],Length[#]>1&];
 orbitgroupsymbols=TexGroupSymbols[#,sym]&/@longorbits;
-If[Length@Select[orbitgroupsymbols,First[#]==="Unkown"&]>0,
-texfail=True;
+If[Length@Select[orbitgroupsymbols,First[#]==="Unkown"&]>0,texfail=True;
 Print["Not a disjoint union of symmetric and antisymmetric groups."];];
 downindexslots=Select[Range[1,Length@indlist],DownIndexQ[indlist[[#]]]&];
 orbitondowninds=xAct`SymManipulator`Private`subsetQ[#,downindexslots]&/@longorbits;
 orbitonupinds=Length[Intersection[#,downindexslots]]==0&/@longorbits;
-If[Not[And@@MapThread[Or,{orbitondowninds,orbitonupinds}]],
-texfail=True;
+If[Not[And@@MapThread[Or,{orbitondowninds,orbitonupinds}]],texfail=True;
 Print["Not all indices are in good positions."]];
 downsymorbits=Pick[longorbits,orbitondowninds];
 upsymorbits=Pick[longorbits,orbitonupinds];
-If[Not@And[OrderedQ[Join@@downsymorbits],OrderedQ[Join@@upsymorbits]],
-texfail=True;
+If[Not@And[OrderedQ[Join@@downsymorbits],OrderedQ[Join@@upsymorbits]],texfail=True;
 Print["The symmetries are overlapping."]];
-excludesymdowninds=Complement[Range[First@#,Last@#],#]&/@downsymorbits;
-excludesymdowninds=Intersection[#,downindexslots]&/@excludesymdowninds;
-excludesymupinds=Complement[Range[First@#,Last@#],#]&/@upsymorbits;
-excludesymupinds=Intersection[#,Complement[Range@n,downindexslots]]&/@excludesymupinds;
+downorbitranges=Intersection[Range[First@#,Last@#],downindexslots]&/@downsymorbits;
+uporbitranges=Intersection[Range[First@#,Last@#],Complement[Range@n,downindexslots]]&/@upsymorbits;
+splitdowninds=Sequence@@@Table[SplitBy[Evaluate[downorbitranges[[i]]],MemberQ[Evaluate[downsymorbits[[i]]],#]&],{i,Length@downsymorbits}];
+splitupinds=Sequence@@@Table[SplitBy[Evaluate[uporbitranges[[i]]],MemberQ[Evaluate[upsymorbits[[i]]],#]&],{i,Length@upsymorbits}];
+excludesymdowninds=Select[splitdowninds,Not@IntersectingQ[Sequence@@@downsymorbits,#]&];
+excludesymupinds=Select[splitupinds,Not@IntersectingQ[Sequence@@@upsymorbits,#]&];
 beginsym=Join[First/@downsymorbits,First/@upsymorbits];
-endsym=Join[Last/@downsymorbits,Last/@upsymorbits]; 
+endsym=Join[Last/@downsymorbits,Last/@upsymorbits];
 beginexclude=Join[First/@Select[excludesymdowninds,(Length@#>0)&],First/@Select[excludesymupinds,(Length@#>0)&]];
 endexclude=Join[Last/@Select[excludesymdowninds,(Length@#>0)&],Last/@Select[excludesymupinds,(Length@#>0)&]];
 preindexsymbolrules=Rule[#,orbitgroupsymbols[[First@First@Position[longorbits,#,2,1],1]]]&/@beginsym;
@@ -571,8 +568,7 @@ postindexsymbolrules=Join[postindexsymbolrules,Rule[#,"|"]&/@endexclude];
 preindexsymbolrules=Rule[#,(#/.preindexsymbolrules)/.Rule[#,""]]&/@Range[n];
 postindexsymbolrules=Rule[#,(#/.postindexsymbolrules)/.Rule[#,""]]&/@Range[n];
 If[texfail,Print["Could not typset the SymH object nicely."];
-StringJoin["\\underset{",label,"}{Sym}(",TexPrint@xAct`SymManipulator`RemoveSym@x,")"],
-TexKnownSymH[headlist,n, indlist,preindexsymbolrules, postindexsymbolrules]]]
+StringJoin["\\underset{",label,"}{Sym}(",TexPrint@xAct`SymManipulator`RemoveSym@x,")"],TexKnownSymH[headlist,n,indlist,preindexsymbolrules,postindexsymbolrules]]]
 
 
 TexKnownSymH[headlist_,n_, indlist_,preindexsymbolrules_, postindexsymbolrules_]:=Module[{numindices=Length/@SlotsOfTensor/@headlist,partitionedslots,internalexpr, indicesoftensor, texstring="",  texstringtensor="", i=1, CovarDs, newheadlist=headlist},
@@ -753,7 +749,13 @@ Protect[latextextwidth];
 
 $TexDirectory=$TemporaryDirectory;
 $TexTmpDirectory=$TemporaryDirectory;
-$LatexExecutable="pdflatex";
+
+
+If[StringMatchQ[System`$Version,"*Linux*"],Module[{latexlist},latexlist=ReadList["!$SHELL -l -c 'which pdflatex'",String];
+If[Length@latexlist>0,$LatexExecutable=StringJoin[First@latexlist," -interaction nonstopmode -halt-on-error"],
+$LatexExecutable:="pdflatex -interaction nonstopmode -halt-on-error"];],
+$LatexExecutable:="pdflatex -interaction nonstopmode -halt-on-error";
+];
 
 
 $TexInitLatexClassCode="\\documentclass[10pt,a4paper]{article}";

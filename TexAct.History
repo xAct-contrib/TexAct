@@ -57,3 +57,10 @@
 7 September - Simplified output for functions in the private list $TrigFuncs, i.e. classical way of writing arguments and powers of functions.
 
 13-24 September - Support for xTerior.
+
+--------------------
+2015
+
+14 May - Fixed missing || for SymH objects that needs several sets of ||.
+16 May - Fixed extra space in Lie derivative, and TexFix for matrices. 
+18 May - Fixed pdflatex path for linux and nonstopmode.

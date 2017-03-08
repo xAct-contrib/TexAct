@@ -14,7 +14,7 @@
 --------------------------------------------------------------------------------
 2013
 
-27 Jan  * Released with version 0.3.1
+27 Jan  * Released with version 0.3.1.
 
 1  Feb  Added TexIndexForm and fixed bug with coloured indices.
 
@@ -37,7 +37,7 @@
 
 7 December - Added Factorials, Pochhammer symbols and Binomials.
 
-7 December * Released with version 0.3.3
+7 December * Released with version 0.3.3.
 
 --------------------
 2014
@@ -58,9 +58,34 @@
 
 13-24 September - Support for xTerior.
 
+28 September * Released with version 0.3.5.
+
 --------------------
 2015
 
 14 May - Fixed missing || for SymH objects that needs several sets of ||.
 16 May - Fixed extra space in Lie derivative, and TexFix for matrices. 
 18 May - Fixed pdflatex path for linux and nonstopmode.
+
+20 July - Added TexOverline etc and changed how these things are constructed from corresponding PrintAs versions.
+
+10 August - Changed so for instance TexColor["a", Red] can be used after EnableTexColor[].
+
+23 August * Released with version 0.3.7.
+
+--------------------
+2016
+6 March - Fixed an issue with TexBreakBy -> "Character" when the string is too long, but nowhere to break it.
+
+12 August - Made OrderedPlus public, introduced ToOrderedPlus to specify term ordering before printing. 
+
+21 September - Introduced the option Labels to TexPrintAlignedEquations which can add the equation names as tex labels.
+- Added error messages to detect if pdflatex was not found.
+
+4 October - fixed a new bug in TexPrintAlignedEquations.
+
+
+--------------------
+2017
+
+6 March - Changed handling of TexOrnament. Now strings beginning with "\!" are transformed into thier corresponding expressions like subscripts etc. These are then interpreted by Tex.

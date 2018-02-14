@@ -20,7 +20,7 @@
 
 
 (* ::Input::Initialization:: *)
-xAct`TexAct`$Version={"0.3.9",{2017,03,06}};
+xAct`TexAct`$Version={"0.4.0",{2018,02,12}};
 xAct`TexAct`$xTensorVersionExpected={"1.1.0",{2013,9,1}};
 
 
@@ -90,7 +90,7 @@ If[Not@OrderedQ@Map[Last,{xAct`TexAct`$xTensorVersionExpected,xAct`xTensor`$Vers
 (* ::Input::Initialization:: *)
 Print[xAct`xCore`Private`bars];
 Print["Package xAct`TexAct`  version ",xAct`TexAct`$Version[[1]],", ",xAct`TexAct`$Version[[2]]];
-Print["CopyRight (C) 2008-2017, Thomas B\[ADoubleDot]ckdahl, Jose M. Martin-Garcia and Barry Wardell, under the General Public License."]
+Print["CopyRight (C) 2008-2018, Thomas B\[ADoubleDot]ckdahl, Jose M. Martin-Garcia and Barry Wardell, under the General Public License."]
 
 
 (* ::Input::Initialization:: *)
@@ -155,6 +155,7 @@ ToOrderedPlus::usage="ToOrderedPlus is a rule that transformes Plus expressions 
 ToOrderedPlusSortFunc::usage="ToOrderedPlusSortFunc is a sorting function for ToOrderedPlus.";
 $TexMatrixParen="$TexMatrixParen sets the parenthesis type for matrices.";
 TexLabelName::usage ="TexLabelName[\"eqname\"] gives the tex label of the equation stored in the variable eqname.";
+TexBreakInParenthesis::usage="TexBreakInParenthesis is an option fot TexBreak. When set to False, no linebreaking is allowed within a parenthesis.";
 
 
 (* ::Input::Initialization:: *)
@@ -783,28 +784,61 @@ Tex[HoldPattern[form:(xAct`xTerior`ChristoffelForm|xAct`xTerior`ConnectionForm|x
 
 
 (* ::Input::Initialization:: *)
-Options[TexBreak]={TexBreakBy->"Character",TexBreakAt->" + "|" - ",TexBreakString->" \\nonumber \\\\ \n&&",EquationMarks->False};
+oldPartitionRagged[l_,p_]:=Last/@Rest@FoldList[{Drop[#1[[1]],#2],Take[#1[[1]],#2]}&,{l,{}},p];
+If[System`$VersionNumber<8.,partitionRagged=oldPartitionRagged,partitionRagged=Internal`PartitionRagged];
 
 
 (* ::Input::Initialization:: *)
-BreakingFunction[rulelist_,n_]:=With[{best=Select[rulelist,#[[1]]<=n&]},If[Length@best==0,Last@First[rulelist],Last@Last@best]]
+Options[TexBreak]={TexBreakBy->"Character",TexBreakAt->" + "|" - ",TexBreakString->" \\nonumber \\\\ \n&&",EquationMarks->False,TexBreakInParenthesis->False};
 
 
 (* ::Input::Initialization:: *)
-TexBreak[string_String,n_,l_List,options___]:=Module[{splittablePositions,breakat,breakby,breakstring,splitat,positions,perLine,splitted,texedwidth,splitstructure,mark,pagewidth,tmpselect},
-{breakat,breakby,breakstring,mark}={TexBreakAt,TexBreakBy,TexBreakString, EquationMarks}/.CheckOptions[options]/.Options[TexBreak];
+BreakingFunction[rulelist_,n_]:=With[{best=Select[rulelist,#[[1]]<=n&]},If[Length@best==0,Last@First[rulelist],Last@Last@best]];
+SplittingFunction[string_String,breakat_,breakinparenthesis_]:=Module[{splittablePositions,splitstructure},
+(* Count the bracket level and split only when breakat appears at bracket level 0. *)
+(* At which position do we find breakat or brackets? *)
+If[breakinparenthesis===True,
+splittablePositions=First/@StringPosition[string,breakat|"{"|"}"],
+splittablePositions=First/@StringPosition[string,breakat|"{"|"}"|"("|")"]
+];
+(* Construct a structure of the kind {pos, n, notbracketQ}, where pos is the position of the character, n is 1 for opening brackets, -1 for closing brackets and 0 for everything else. *)
+splitstructure=Switch[StringTake[string,{#}],"{",{#,1,False},"(",{#,1,False},"}",{#,-1,False},")",{#,-1,False},_,{#,0,True}]&/@splittablePositions;
+(* Compute the bracket level by accumulating the n's. Return a structure {pos, possiblebreakQ}, and extract the possible breaking positions. *)
+splitstructure=MapThread[{#1[[1]],And[#2==0,#1[[3]]]}&,{splitstructure,Accumulate[#[[2]]&/@splitstructure]}];
+splittablePositions=First/@Select[splitstructure,#[[2]]&]];
+PointBreakingFunction[perLinein_,n_,texedwidthin_,pagewidth_,splittablePositionsin_]:=Module[{nearestTerm,positions={},perLine=perLinein,texedwidth=texedwidthin,splittablePositions=splittablePositionsin},
+(* Split parts where lengths are given explicitly *)
+While[And[Length@perLine>0,Length@splittablePositions>0],
+nearestTerm=BreakingFunction[Thread@Rule[Accumulate@texedwidth, Range@Length@texedwidth],perLine[[1]]/.latextextwidth->pagewidth];
+perLine=Rest@Normal@perLine;
+If[nearestTerm<=Length@splittablePositions,
+AppendTo[positions,splittablePositions[[nearestTerm]]];
+splittablePositions=Drop[splittablePositions,nearestTerm];
+texedwidth=Drop[texedwidth,nearestTerm],
+splittablePositions={};
+texedwidth={};];
+];
+(* Split remainder into strings of length~n) *)
+While[Length@splittablePositions>0,
+nearestTerm=BreakingFunction[Thread@Rule[Accumulate@texedwidth, Range@Length@texedwidth],n/.latextextwidth->pagewidth];
+If[nearestTerm<=Length@splittablePositions,
+AppendTo[positions,splittablePositions[[nearestTerm]]];
+splittablePositions=Drop[splittablePositions,nearestTerm];
+texedwidth=Drop[texedwidth,nearestTerm],
+splittablePositions={};
+texedwidth={};];
+];
+positions];
+
+
+(* ::Input::Initialization:: *)
+TexBreak[string_String,n_,l_List,options___]:=Module[{splittablePositions,breakat,breakby,breakstring,splitat,positions,perLine,splitted,texedwidth,mark,pagewidth,tmpselect,breakinparenthesis},
+{breakat,breakby,breakstring,mark,breakinparenthesis}={TexBreakAt,TexBreakBy,TexBreakString, EquationMarks,TexBreakInParenthesis}/.CheckOptions[options]/.Options[TexBreak];
 
 (* Positions where the string can be split: wherever + or - is encountered *)
 (* Older code: splittablePositions=First/@StringPosition[string,breakat]; *)
 
-(* Count the bracket level and split only when breakat appears at bracket level 0. *)
-(* At which position do we find breakat or brackets? *)
-splittablePositions=First/@StringPosition[string,Append[Append[breakat,"{"],"}"]];
-(* Construct a structure of the kind {pos, n, notbracketQ}, where pos is the position of the character, n is 1 for opening brackets, -1 for closing brackets and 0 for everything else. *)
-splitstructure=Switch[StringTake[string,{#}],"{",{#,1,False},"}",{#,-1,False},_,{#,0,True}]&/@splittablePositions;
-(* Compute the bracket level by accumulating the n's. Return a structure {pos, possiblebreakQ}, and extract the possible breaking positions. *)
-splitstructure=MapThread[{#1[[1]],And[#2==0,#1[[3]]]}&,{splitstructure,Accumulate[#[[2]]&/@splitstructure]}];
-splittablePositions=First/@Select[splitstructure,#[[2]]&];
+splittablePositions=SplittingFunction[string,breakat,breakinparenthesis];
 
 (* The terms/characters per line that the user specified *)
 If[l!={},perLine=SparseArray[l,Automatic,n],perLine={n}];
@@ -847,34 +881,12 @@ splitat=Accumulate[perLine];
 positions=Map[Part[splittablePositions,#]&,splitat];,
 
 "TexPoint",
-positions={};
 splitted=StringTake[string,Thread[{Prepend[splittablePositions,1],Append[splittablePositions-1,StringLength@string]}]];
 texedwidth=TexWidths@@splitted;
 pagewidth=First@texedwidth;
 texedwidth=Rest@texedwidth;
-Module[{nearestTerm},
-(* Split parts where lengths are given explicitly *)
-While[And[Length@perLine>0,Length@splittablePositions>0],
-nearestTerm=BreakingFunction[Thread@Rule[Accumulate@texedwidth, Range@Length@texedwidth],perLine[[1]]/.latextextwidth->pagewidth];
-perLine=Rest@Normal@perLine;
-If[nearestTerm<=Length@splittablePositions,
-AppendTo[positions,splittablePositions[[nearestTerm]]];
-splittablePositions=Drop[splittablePositions,nearestTerm];
-texedwidth=Drop[texedwidth,nearestTerm],
-splittablePositions={};
-texedwidth={};];
-];
-(* Split remainder into strings of length~n) *)
-While[Length@splittablePositions>0,
-nearestTerm=BreakingFunction[Thread@Rule[Accumulate@texedwidth, Range@Length@texedwidth],n/.latextextwidth->pagewidth];
-If[nearestTerm<=Length@splittablePositions,
-AppendTo[positions,splittablePositions[[nearestTerm]]];
-splittablePositions=Drop[splittablePositions,nearestTerm];
-texedwidth=Drop[texedwidth,nearestTerm],
-splittablePositions={};
-texedwidth={};];
-];
-],
+positions=PointBreakingFunction[perLine,n,texedwidth,pagewidth,splittablePositions];
+,
 
 _,
 Throw["Invalid value for option TexBreakBy."]
@@ -899,7 +911,7 @@ $TexTmpDirectory=$TemporaryDirectory;
 
 
 (* ::Input::Initialization:: *)
-If[StringMatchQ[System`$Version,"*Linux*"],Module[{latexlist},latexlist=ReadList["!$SHELL -l -c 'which pdflatex'",String];
+If[Or[StringMatchQ[System`$Version,"*Linux*"],StringMatchQ[System`$Version,"*Mac OS*"]],Module[{latexlist},latexlist=ReadList["!$SHELL -l -c 'which pdflatex'",String];
 If[Length@latexlist>0,$LatexExecutable=StringJoin[First@latexlist," -interaction nonstopmode -halt-on-error"],
 $LatexExecutable:="pdflatex -interaction nonstopmode -halt-on-error"];],
 $LatexExecutable:="pdflatex -interaction nonstopmode -halt-on-error";
@@ -946,6 +958,7 @@ ExtractTexWidths[str1_List]:=With[{str2=Drop[str1,First@First@Position[str1,"xAc
 (* ::Input::Initialization:: *)
 TexWidths[strs___]:=
 Module[{TexOut,errorpos},
+(* Print["TexWidth call with list length ", Length@{strs}];*)
 SetDirectory[$TexTmpDirectory];
 TexWidthsWriteFile[strs];
 TexOut=ReadList["!"<>$LatexExecutable<>" TexActWidthTest.tex",String];
@@ -996,19 +1009,24 @@ Options[TexPrintAlignedEquations]={Labels->False};
 
 
 (* ::Input::Initialization:: *)
-TexLabelName[str_String]:="eq:"<>str;
+TexLabelName[str_String]:="eq:"<>StringReplace[ToString[str,CharacterEncoding->"ASCII"],"\\["~~a:ShortestMatch[___]~~"]":>a];
 
 
 (* ::Input::Initialization:: *)
-TexPrintAlignedEquations[eqlist:{eqs___},OptionsPattern[]]:=Module[{TexLHS=TexPrint[xAct`TexAct`Private`LHSpart@#]&/@eqlist,TexRHS=TexPrint[xAct`TexAct`Private`RHSpart@#]&/@eqlist,LHSWidths,MaxRHSWidth,pagewidth,eqnames={ReleaseHold[ToString/@HoldForm/@Hold[eqs]]}},
-LHSWidths=xAct`TexAct`Private`TexWidths@@(StringJoin[#," ={}"]&/@TexLHS);
-pagewidth=First@LHSWidths;
-LHSWidths=Rest@LHSWidths;
-MaxRHSWidth=Round[($TexPrintPageWidth/.latextextwidth->pagewidth)-Max@LHSWidths];
+TexPrintAlignedEquations[eqlist:{eqs___},OptionsPattern[]]:=Module[{TexLHS=TexPrint[xAct`TexAct`Private`LHSpart@#]&/@eqlist,TexRHS=TexPrint[xAct`TexAct`Private`RHSpart@#]&/@eqlist,splittableRHSPositions,splittedRHS,AllWidths,LHSWidths,RHSWidths,MaxRHSWidth,pagewidth,RHSBreakPositions,eqnames={ReleaseHold[ToString/@HoldForm/@Hold[eqs]]}},
+TexLHS=(StringJoin[#,"={}"]&/@TexLHS);
 TexRHS=TexBreak[#,1,TexBreakBy->"Term",TexBreakString->"\n"]&/@TexRHS;
-TexRHS=TexBreak[#,MaxRHSWidth,TexBreakBy->"TexPoint",TexBreakString->"\\nonumber\\\\\n&"]&/@TexRHS;
+splittableRHSPositions=SplittingFunction[#,TexBreakAt/.Options[TexBreak],TexBreakInParenthesis/.Options[TexBreak]]&/@TexRHS;
+splittedRHS=StringTake[#1,Thread[{Prepend[#2,1],Append[#2-1,StringLength@#1]}]]&@@@(Thread[{TexRHS,splittableRHSPositions}]);
+AllWidths=TexWidths@@Join[TexLHS,Join@@splittedRHS];
+pagewidth=First@AllWidths;
+LHSWidths=Take[Rest@AllWidths,Length@TexLHS];
+RHSWidths=partitionRagged[Drop[AllWidths,1+Length@TexLHS],Length/@splittedRHS];
+MaxRHSWidth=Round[($TexPrintPageWidth/.latextextwidth->pagewidth)-Max@LHSWidths];
+RHSBreakPositions=PointBreakingFunction[{MaxRHSWidth},MaxRHSWidth,#1,pagewidth,#2]&@@@(Thread[{RHSWidths,splittableRHSPositions}]);
+TexRHS=StringInsert[#1,"\\nonumber\\\\\n&",#2]&@@@(Thread[{TexRHS,RHSBreakPositions}]);
 TexRHS=StringReplace[#,"\n\\nonumber"->"\\nonumber"]&/@TexRHS;
-StringJoin["\\begin{align}\n",StringReplace[StringJoin[Riffle[MapThread[StringJoin[#1,"={}&",#2, If[And[OptionValue[Labels],NameQ[#3]],StringJoin[" \\label{",TexLabelName[#3],"}"],""]]&,{TexLHS,TexRHS,eqnames}],",\\\\\n"]],",\\\\\n="-> "\\\\\n="],".\n\\end{align}"]]
+StringJoin["\\begin{align}\n",StringReplace[StringJoin[Riffle[MapThread[StringJoin[#1,"&",#2, If[And[OptionValue[Labels],NameQ[#3]],StringJoin[" \\label{",TexLabelName[#3],"}"],""]]&,{TexLHS,TexRHS,eqnames}],",\\\\\n"]],",\\\\\n="-> "\\\\\n="],".\n\\end{align}"]]
 TexPrintAlignedEquations[other_,x___]:=TexPrintAlignedEquations[Evaluate@other,x]
 
 

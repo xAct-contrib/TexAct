@@ -89,3 +89,13 @@
 2017
 
 6 March - Changed handling of TexOrnament. Now strings beginning with "\!" are transformed into thier corresponding expressions like subscripts etc. These are then interpreted by Tex.
+
+18 August - Fixed pdflatex path for Mac.
+
+24 September - Added option TexBreakInParenthesis for TexBreak.
+
+--------------------
+2018
+
+11 February - Rewrote TexBreak and TexPrintAlignedEquations so TexPrintAlignedEquations only calls TexWidths once. 
+TexLabelName now extracts the name of special characters to create labels accepted by LaTeX.

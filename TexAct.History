@@ -99,3 +99,11 @@
 
 11 February - Rewrote TexBreak and TexPrintAlignedEquations so TexPrintAlignedEquations only calls TexWidths once. 
 TexLabelName now extracts the name of special characters to create labels accepted by LaTeX.
+
+22 February - Added $TexNoSumInNumerator. If set to True Tex will move all sums in numerators out of fractions.
+
+24 February - Change handling of strings beginning with "\!" again. Now such strings are converted into proper boxes via the well hidden function FrontEndExecute[FrontEnd`UndocumentedTestFEParserPacket[str, False]].
+
+25 February - Added the $TexViewInternal. If this is set to True, TexView uses $TexInitLatexInternalClassCode instead of $TexInitLatexClassCode and imports the .pdf into Mathematica instead of an external viewer. However, importing pdf files only works on some combinations of OS and Mathematica versions, so it might very well not work on your system. $TexInitLatexExtraCode = {"\\pdfminorversion=3"}; can help in a few cases. 
+
+28 February - Parenthesis styles can now be adjusted with OpenParenthesis and CloseParenthesis for each level. 

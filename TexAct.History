@@ -107,3 +107,5 @@ TexLabelName now extracts the name of special characters to create labels accept
 25 February - Added the $TexViewInternal. If this is set to True, TexView uses $TexInitLatexInternalClassCode instead of $TexInitLatexClassCode and imports the .pdf into Mathematica instead of an external viewer. However, importing pdf files only works on some combinations of OS and Mathematica versions, so it might very well not work on your system. $TexInitLatexExtraCode = {"\\pdfminorversion=3"}; can help in a few cases. 
 
 28 February - Parenthesis styles can now be adjusted with OpenParenthesis and CloseParenthesis for each level. 
+
+29 March - Fixed an issue with TexBreakBy -> "Character".

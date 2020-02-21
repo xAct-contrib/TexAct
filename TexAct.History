@@ -108,4 +108,14 @@ TexLabelName now extracts the name of special characters to create labels accept
 
 28 February - Parenthesis styles can now be adjusted with OpenParenthesis and CloseParenthesis for each level. 
 
-29 March - Fixed an issue with TexBreakBy -> "Character".
+--------------------
+2019
+
+19 September - Added support for integer values for TexBreakInParenthesis. This now allows for specification of a parenthesis depth where linebreaking is prohibited.
+31 October - Fixed problem with the InertHead Tex output. The cell was not an initialization cell.
+
+--------------------
+2020
+
+19 February - Fixed an issue with LD_LIBRARY_PATH on some Linux distributions. Thanks Guillaume Faye for reporting this. If you have a linux system that worked before, but fails now try setting 
+xAct`TexAct`Private`$LinuxStdLib = False and contact Thomas.

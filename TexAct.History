@@ -119,3 +119,9 @@ TexLabelName now extracts the name of special characters to create labels accept
 
 19 February - Fixed an issue with LD_LIBRARY_PATH on some Linux distributions. Thanks Guillaume Faye for reporting this. If you have a linux system that worked before, but fails now try setting 
 xAct`TexAct`Private`$LinuxStdLib = False and contact Thomas.
+
+11 December - Added support for Unequal. 
+
+--------------------
+2021
+21 January - Added several functions for typesetting of matrices.

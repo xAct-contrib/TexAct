@@ -20,7 +20,7 @@
 
 
 (* ::Input::Initialization:: *)
-xAct`TexAct`$Version={"0.4.2",{2021,01,21}};
+xAct`TexAct`$Version={"0.4.2",{2021,02,19}};
 xAct`TexAct`$xTensorVersionExpected={"1.1.0",{2013,9,1}};
 
 
@@ -380,6 +380,13 @@ Tex[GridBox[M_List,b___]]:=Module[{rows=Length[M],cols=Length@First@M},StringJoi
 Tex[TagBox[a_,b___]]:=Tex[a];
 Tex[StyleBox[a__]]:=TexStyleBox[a];
 TexStyleBox[a_,___]:=Tex@a;
+Tex[InterpretationBox[a_,__]]:=Tex[a];
+
+
+(* ::Input::Initialization:: *)
+Tex[Subscript[expr___]]:=Tex[SubscriptBox[expr]];
+Tex[Superscript[expr___]]:=Tex[SuperscriptBox[expr]];
+Tex[Subsuperscript[expr___]]:=Tex[SubsuperscriptBox[expr]];
 
 
 (* ::Input::Initialization:: *)

@@ -125,3 +125,5 @@ xAct`TexAct`Private`$LinuxStdLib = False and contact Thomas.
 --------------------
 2021
 21 January - Added several functions for typesetting of matrices.
+
+19 February - Added support for InterpretationBox, Subscript, Superscript and Subsuperscript.

@@ -127,3 +127,8 @@ xAct`TexAct`Private`$LinuxStdLib = False and contact Thomas.
 21 January - Added several functions for typesetting of matrices.
 
 19 February - Added support for InterpretationBox, Subscript, Superscript and Subsuperscript.
+
+9  October - TexBreak "Character" failed if no splittable positions found - now fixed.
+TexBreak can now break between \{ \} but not { }.
+Fractions with OrderedPlus starting with - now prints much better.
+

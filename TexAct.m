@@ -20,7 +20,7 @@
 
 
 (* ::Input::Initialization:: *)
-xAct`TexAct`$Version={"0.4.2",{2021,02,19}};
+xAct`TexAct`$Version={"0.4.2",{2021,10,09}};
 xAct`TexAct`$xTensorVersionExpected={"1.1.0",{2013,9,1}};
 
 
@@ -293,6 +293,10 @@ TexFracExpression2[numer, denom,fracsymbol]];
 
 
 (* ::Input::Initialization:: *)
+TexFracExpression2[numer_OrderedPlus, denom_,fracsymbol_]:=If[WithMinusQ[numer],
+StringJoin[TexOperator[Minus],TexFrac1[Times[-1,#]&/@numer,denom,fracsymbol]],
+TexFrac1[numer,denom,fracsymbol]
+];
 TexFracExpression2[numer_, denom_,fracsymbol_]:=If[WithMinusQ[numer],
 StringJoin[TexOperator[Minus],TexFrac1[-(numer),denom,fracsymbol]],
 TexFrac1[numer,denom,fracsymbol]
@@ -870,6 +874,7 @@ If[breakinparenthesis===True,
 splittablePositions=First/@StringPosition[string,breakat|"{"|"}"],
 splittablePositions=First/@StringPosition[string,breakat|"{"|"}"|"("|")"]
 ];
+splittablePositions=Complement[splittablePositions,Last/@StringPosition[string,"\{"|"\}"]];
 If[IntegerQ[breakinparenthesis],breakdepth=breakinparenthesis,breakdepth=0];
 (* Construct a structure of the kind {pos, n, m, notbracketQ}, where pos is the position of the character, n is 1 for opening brackets, -1 for closing brackets and 0 for everything else. m is the same thing for parenthesis. *)
 splitstructure=Switch[StringTake[string,{#}],"{",{#,1,0,False},"(",{#,0,1,False},"}",{#,-1,0,False},")",{#,0,-1,False},_,{#,0,0,True}]&/@splittablePositions;
@@ -921,7 +926,7 @@ positions={};
 Module[{iter,currentPosition=0,nearestPosition,strlen=StringLength[string]},
 (* Split parts where lengths are given explicitly *)For[iter=1,(iter<=Length[perLine])&&(currentPosition+perLine[[iter]]<strlen),iter++,
 tmpselect=Select[splittablePositions-currentPosition,Positive];
-nearestPosition=Nearest[Select[splittablePositions-currentPosition,Positive],perLine[[iter]]];
+nearestPosition=If[Length[tmpselect]>0,Nearest[tmpselect,perLine[[iter]]],{}];
 
 If[nearestPosition!={},
 currentPosition+=First@nearestPosition;

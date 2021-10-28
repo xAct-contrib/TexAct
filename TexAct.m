@@ -164,6 +164,7 @@ $TexInitLatexInternalClassCode::usage="The document class code for by TexView if
 $TexViewInternal::usage="If $TexViewInternal==True, TexView will open the typset file in Mathematica instead of an external viewer. Observe that $TexInitLatexInternalClassCode will be used instead of $TexInitLatexClassCode in this case.";
 OpenParenthesis::usage ="OpenParenthesis[level, char] determines how an opening parenthesis at level with default character char will be displayed. If one for instance wants brackets instead of round parenthesis at level 1, set OpenParenthesis[1,\"(\"]:=\"\\bigl [\"";
 CloseParenthesis::usage ="CloseParenthesis[level, char] determines how a closing parenthesis at level with default character char will be displayed. If one for instance wants brackets instead of round parenthesis at level 1, set CloseParenthesis[1,\")\"]:=\"\\bigl ]\"";
+LastPunctuation::usage="LastPunctuation is an option for TexPrintAlignedEquations indicting if the equation should end with a , or ."
 
 
 (* ::Input::Initialization:: *)

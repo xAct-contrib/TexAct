@@ -132,3 +132,5 @@ xAct`TexAct`Private`$LinuxStdLib = False and contact Thomas.
 TexBreak can now break between \{ \} but not { }.
 Fractions with OrderedPlus starting with - now prints much better.
 
+28 October - Added option LastPunctuation for TexPrintAlignedEquations and improved automatic label generation.
+

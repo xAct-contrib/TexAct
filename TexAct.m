@@ -20,7 +20,7 @@
 
 
 (* ::Input::Initialization:: *)
-xAct`TexAct`$Version={"0.4.2",{2021,10,09}};
+xAct`TexAct`$Version={"0.4.3",{2021,10,28}};
 xAct`TexAct`$xTensorVersionExpected={"1.1.0",{2013,9,1}};
 
 
@@ -58,7 +58,7 @@ You should have received a copy of the GNU General Public License
   
 (* :Context: xAct`Texsor` *)
 
-(* :Package Version: 0.4.2 *)
+(* :Package Version: 0.4.3 *)
 
 (* :Copyright: Thomas B\[ADoubleDot]ckdahl, Jose M. Martin-Garcia and Barry Wardell (2008-2019) *)
 
@@ -1087,7 +1087,7 @@ RHSpart[b_]:=b
 
 (* ::Input::Initialization:: *)
 SetAttributes[TexPrintAlignedEquations,HoldFirst];
-Options[TexPrintAlignedEquations]={Labels->False};
+Options[TexPrintAlignedEquations]={Labels->False,LastPunctuation->"."};
 
 
 (* ::Input::Initialization:: *)
@@ -1095,7 +1095,7 @@ TexLabelName[str_String]:="eq:"<>StringReplace[ToString[str,CharacterEncoding->"
 
 
 (* ::Input::Initialization:: *)
-TexPrintAlignedEquations[eqlist:{eqs___},OptionsPattern[]]:=Module[{TexLHS=TexPrint[xAct`TexAct`Private`LHSpart@#]&/@eqlist,TexRHS=TexPrint[xAct`TexAct`Private`RHSpart@#]&/@eqlist,splittableRHSPositions,splittedRHS,AllWidths,LHSWidths,RHSWidths,MaxRHSWidth,pagewidth,RHSBreakPositions,eqnames={ReleaseHold[ToString/@HoldForm/@Hold[eqs]]}},
+TexPrintAlignedEquations2[eqlist:{eqs___},uselabelsq_,lastPunctuation_,labellist_ ]:=Module[{TexLHS=TexPrint[LHSpart@#]&/@eqlist,TexRHS=TexPrint[RHSpart@#]&/@eqlist,splittableRHSPositions,splittedRHS,AllWidths,LHSWidths,RHSWidths,MaxRHSWidth,pagewidth,RHSBreakPositions},
 TexLHS=(StringJoin[#,"={}"]&/@TexLHS);
 TexRHS=TexBreak[#,1,TexBreakBy->"Term",TexBreakString->"\n"]&/@TexRHS;
 splittableRHSPositions=SplittingFunction[#,TexBreakAt/.Options[TexBreak],TexBreakInParenthesis/.Options[TexBreak]]&/@TexRHS;
@@ -1108,7 +1108,23 @@ MaxRHSWidth=Round[($TexPrintPageWidth/.latextextwidth->pagewidth)-Max@LHSWidths]
 RHSBreakPositions=PointBreakingFunction[{MaxRHSWidth},MaxRHSWidth,#1,pagewidth,#2]&@@@(Thread[{RHSWidths,splittableRHSPositions}]);
 TexRHS=StringInsert[#1,"\\nonumber\\\\\n&",#2]&@@@(Thread[{TexRHS,RHSBreakPositions}]);
 TexRHS=StringReplace[#,"\n\\nonumber"->"\\nonumber"]&/@TexRHS;
-StringJoin["\\begin{align}\n",StringReplace[StringJoin[Riffle[MapThread[StringJoin[#1,"&",#2, If[And[OptionValue[Labels],NameQ[#3]],StringJoin[" \\label{",TexLabelName[#3],"}"],""]]&,{TexLHS,TexRHS,eqnames}],",\\\\\n"]],",\\\\\n="-> "\\\\\n="],".\n\\end{align}"]]
+StringJoin["\\begin{align}\n",StringReplace[StringJoin[Riffle[MapThread[StringJoin[#1,"&",#2, If[uselabelsq,StringJoin[" \\label{",#3,"}"],""]]&,{TexLHS,TexRHS,labellist}],",\\\\\n"]],",\\\\\n="-> "\\\\\n="],lastPunctuation<>"\n\\end{align}"]]
+
+
+(* ::Input::Initialization:: *)
+TexPrintAlignedEquations[eqlist:{eqs___},OptionsPattern[]]:=Module[{eqnames={ReleaseHold[ToString/@HoldForm/@Hold[eqs]]},labellist},
+labellist=If[And[OptionValue[Labels],NameQ[#]],TexLabelName[#],""]&/@eqnames;
+TexPrintAlignedEquations2[eqlist,OptionValue[Labels],OptionValue[LastPunctuation],labellist]]
+
+
+(* ::Input::Initialization:: *)
+TexPrintAlignedEquations[eqlist_,OptionsPattern[]]:=Module[{eqlistname=TexLabelName@ToString@HoldForm[eqlist],labellist},
+labellist=StringJoin[eqlistname,ToString[#]]&/@Range[Length[eqlist]];
+TexPrintAlignedEquations2[eqlist,OptionValue[Labels],OptionValue[LastPunctuation],labellist]
+]/;And[NameQ@ToString@HoldForm[eqlist],Head[eqlist]==List]
+
+
+(* ::Input::Initialization:: *)
 TexPrintAlignedEquations[other_,x___]:=TexPrintAlignedEquations[Evaluate@other,x]
 
 

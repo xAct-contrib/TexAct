@@ -134,3 +134,7 @@ Fractions with OrderedPlus starting with - now prints much better.
 
 28 October - Added option LastPunctuation for TexPrintAlignedEquations and improved automatic label generation.
 
+--------------------
+2021
+27 October - Added more trig functions and Rule.
+           - Added support for more special symbols and boxes.

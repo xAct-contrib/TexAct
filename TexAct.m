@@ -20,14 +20,14 @@
 
 
 (* ::Input::Initialization:: *)
-xAct`TexAct`$Version={"0.4.3",{2021,10,28}};
+xAct`TexAct`$Version={"0.4.4",{2022,10,27}};
 xAct`TexAct`$xTensorVersionExpected={"1.1.0",{2013,9,1}};
 
 
 (* ::Input::Initialization:: *)
 (* TexAct, Tex code to format xAct expressions *)
 
-(* Copyright (C) 2008-2019 Thomas B\[ADoubleDot]ckdahl, Jose M. Martin-Garcia and Barry Wardell *)
+(* Copyright (C) 2008-2022 Thomas B\[ADoubleDot]ckdahl, Jose M. Martin-Garcia and Barry Wardell *)
 
 (* This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published
@@ -58,7 +58,7 @@ You should have received a copy of the GNU General Public License
   
 (* :Context: xAct`Texsor` *)
 
-(* :Package Version: 0.4.3 *)
+(* :Package Version: 0.4.4 *)
 
 (* :Copyright: Thomas B\[ADoubleDot]ckdahl, Jose M. Martin-Garcia and Barry Wardell (2008-2019) *)
 
@@ -337,6 +337,12 @@ Tex["\\"]="\\backslash";
 Tex["\[GreaterTilde]"]="\\gtrsim";
 
 
+Tex["\[Koppa]"]="\\text{\\textqoppa}";
+Tex["\[Sampi]"]="\\text{\\textsampi}";
+Tex["\[CapitalKoppa]"]="\\text{\\textQoppa}";
+Tex["\[CapitalSampi]"]="\\text{\\textSampi}";
+
+
 (* ::Input::Initialization:: *)
 Tex["\[EmptyDownTriangle]"]:="\\nabla";
 
@@ -369,6 +375,8 @@ Tex[OverscriptBox[a_String?(StringLength[#]==1&),"_"]]:=TexBar[Tex@a];
 Tex[OverscriptBox[a_,"_"]]:=TexOverline[Tex@a];
 Tex[OverscriptBox[a_,"."]]:=StringJoin["\\dot{",Tex@a,"}"];
 Tex[OverscriptBox[a_,"\[DoubleDot]"]]:=StringJoin["\\ddot{",Tex@a,"}"];
+Tex[OverscriptBox[a_,"\[Hacek]"]]:=StringJoin["\\check{",Tex@a,"}"];
+Tex[OverscriptBox[a_,OverscriptBox["\[OverBrace]",b_]]]:=StringJoin["\\overbrace{",Tex@a,"}^{",Tex@b,"}"];
 Tex[UnderscriptBox[a_,"_"]]:=TexUnderline[Tex@a];
 Tex[SubscriptBox[a_,b_]]:=StringJoin[Tex@a,"_{",Tex@b,"}{}"];
 Tex[OverscriptBox[a_,b_]]:=StringJoin["\\overset{",Tex@b,"}{",Tex@a,"}"];
@@ -382,6 +390,7 @@ Tex[FractionBox[a_,b_]]:=StringJoin["\\frac{",Tex@a,"}{",Tex@b,"}"];
 Tex[SqrtBox[a_]]:=StringJoin["\\sqrt{",Tex@a,"}"];
 Tex[RadicalBox[a_,b_]]:=StringJoin["\\sqrt[",Tex@b,"]{",Tex@a,"}"];
 Tex[GridBox[M_List,b___]]:=Module[{rows=Length[M],cols=Length@First@M},StringJoin["\\begin{array}{",StringJoin@@ConstantArray["c",{cols}],"}\n",StringJoin[Riffle[StringJoin[Riffle[Tex/@#," & "]]&/@M,"\\\\\n"]],"\n\\end{array}"]];
+Tex[FrameBox[a_]]:=StringJoin["\\fbox{",Tex[a],"}"];
 Tex[TagBox[a_,b___]]:=Tex[a];
 Tex[StyleBox[a__]]:=TexStyleBox[a];
 TexStyleBox[a_,___]:=Tex@a;
@@ -406,6 +415,12 @@ Tex[Log]:="\\log";
 Tex[Sinh]:="\\sinh";
 Tex[Cosh]:="\\cosh";
 Tex[Tanh]:="\\tanh";
+Tex[ArcSin]:="\\arcsin";
+Tex[ArcCos]:="\\arccos";
+Tex[ArcTan]:="\\arctan";
+Tex[ArcSinh]:="\\arcsinh";
+Tex[ArcCosh]:="\\arccosh";
+Tex[ArcTanh]:="\\arctanh";
 
 
 (* ::Input::Initialization:: *)
@@ -682,6 +697,9 @@ Tex[GreaterEqual]:=" \\geq ";
 (* Unequal *)
 Tex[expr_Unequal]:=StringJoin[Riffle[Tex/@List@@expr," \\neq "]];
 Tex[Unequal]:=" \\neq ";
+
+
+Tex[Rule[a_, b_]] := Tex[a] <> "\\rightarrow " <> Tex[b]
 
 
 (* ::Input::Initialization:: *)

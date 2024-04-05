@@ -138,3 +138,7 @@ Fractions with OrderedPlus starting with - now prints much better.
 2021
 27 October - Added more trig functions and Rule.
            - Added support for more special symbols and boxes.
+
+--------------------
+2024
+5 April    - Added $TexViewResolution to set the image resolution for TexView if If $TexViewInternal==True is used.

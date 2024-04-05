@@ -20,7 +20,7 @@
 
 
 (* ::Input::Initialization:: *)
-xAct`TexAct`$Version={"0.4.4",{2022,10,27}};
+xAct`TexAct`$Version={"0.4.4",{2024,04,05}};
 xAct`TexAct`$xTensorVersionExpected={"1.1.0",{2013,9,1}};
 
 
@@ -162,9 +162,10 @@ TexBreakInParenthesis::usage="TexBreakInParenthesis is an option for TexBreak. W
 $TexNoSumInNumerator::usage = "If $TexNoSumInNumerator is set to True, Tex will move all sums in numerators out of fractions.";
 $TexInitLatexInternalClassCode::usage="The document class code for by TexView if $TexViewInternal==True.";
 $TexViewInternal::usage="If $TexViewInternal==True, TexView will open the typset file in Mathematica instead of an external viewer. Observe that $TexInitLatexInternalClassCode will be used instead of $TexInitLatexClassCode in this case.";
+$TexViewResolution::usage="If $TexViewInternal==True, TexView will open he typset file in Mathematica using the resolution $TexViewResolution.";
 OpenParenthesis::usage ="OpenParenthesis[level, char] determines how an opening parenthesis at level with default character char will be displayed. If one for instance wants brackets instead of round parenthesis at level 1, set OpenParenthesis[1,\"(\"]:=\"\\bigl [\"";
 CloseParenthesis::usage ="CloseParenthesis[level, char] determines how a closing parenthesis at level with default character char will be displayed. If one for instance wants brackets instead of round parenthesis at level 1, set CloseParenthesis[1,\")\"]:=\"\\bigl ]\"";
-LastPunctuation::usage="LastPunctuation is an option for TexPrintAlignedEquations indicting if the equation should end with a , or ."
+LastPunctuation::usage="LastPunctuation is an option for TexPrintAlignedEquations indicting if the equation should end with a , or .";
 
 
 (* ::Input::Initialization:: *)
@@ -1186,6 +1187,7 @@ Close[outfile];];
 
 (* ::Input::Initialization:: *)
 $TexViewInternal=False;
+$TexViewResolution =400;
 
 
 (* ::Input::Initialization:: *)
@@ -1206,7 +1208,7 @@ Print["Typesetting OK."];
 If[openfileq,
 If[$TexViewInternal,
 Print["Importing file: ", file,$TexViewExt];
-Module[{result=Import[StringJoin[file,$TexViewExt]]},
+Module[{result=Import[StringJoin[file,$TexViewExt], ImageResolution->$TexViewResolution]},
 ResetDirectory[];
 result[[1]]],
 Print["Opening file: ", file,$TexViewExt];

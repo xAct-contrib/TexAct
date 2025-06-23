@@ -142,3 +142,10 @@ Fractions with OrderedPlus starting with - now prints much better.
 --------------------
 2024
 5 April    - Added $TexViewResolution to set the image resolution for TexView if If $TexViewInternal==True is used.
+
+--------------------
+2025
+8 June     - Added the option TexBreakAvoidEnv to avoid breaking inside some latex environments.
+
+23 June    - Added some support for OverlayBox with the slashed package. Also some tipa symbols were added.
+
